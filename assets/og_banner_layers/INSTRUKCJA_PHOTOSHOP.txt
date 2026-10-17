@@ -1,0 +1,13 @@
+AGENTMOTION - OG BANNER (DISCORD / TWITTER) PHOTOSHOP LAYERS
+=============================================================
+Wymiary płótna w Photoshopie: 1200 x 630 px (RGB, 72 lub 300 DPI)
+
+Jak złożyć w Photoshopie:
+1. Otwórz Photoshopa i stwórz nowy dokument: 1200 x 630 px.
+2. Zaznacz wszystkie pliki PNG o nazwach 01_... do 11_... i przeciągnij je do Photoshopa (Enter na każdej warstwie).
+   Każda warstwa ma dokładnie 1200x630 px z przezroczystością, więc wskoczy idealnie na swoje miejsce bez przesuwania!
+3. Możesz dowolnie zmieniać kolory, dodawać własne efekty, gradienty, cienie, zmieniać napisy czy podmieniać screeny.
+4. Po skończeniu wyeksportuj gotowy plik jako PNG i zapisz go pod ścieżką:
+   webapp/assets/og-image.png
+   (lub zastąp obecny plik og-image.png).
+5. Zrób git push, a Vercel zaktualizuje baner w kilka sekund!
