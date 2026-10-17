@@ -1,0 +1,8 @@
+div.second {
+  background-color: lightgreen;
+}
+div.second div {
+  display: flex;
+  justify-content: center;
+  color: brown;
+}/*# sourceMappingURL=second.css.map */

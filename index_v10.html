@@ -1,0 +1,2342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentMotion - Automated Minecraft GUI Animations for Premiere Pro</title>
+<meta name="description" content="Generate pixel-perfect Minecraft GUI animations in one click. Native multi-track timelines for Premiere Pro 2026. 100% editable layers, 60fps, integer scaling.">
+<link rel="icon" href="assets/logov4.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Silkscreen&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* AgentMotion v10 - Creator-First Precision Engine */
+:root {
+  --paper: #0b0d13;
+  --surface: #12151f;
+  --surface-2: #171b27;
+  --elev: #1e2333;
+  --ink: #f4f5f8;
+  --ink-2: #a5abbd;
+  --muted: #656d82;
+  --rule: #222738;
+  --rule-sub: #171b26;
+  --accent: #26a8ff;
+  --accent-hover: #3eb5ff;
+  --accent-dim: #134568;
+  --accent-ink: #071723;
+  --ok: #34d399;
+  --ok-surface: #0e1a15;
+  --ok-border: #1f5c46;
+  --warn: #f59e0b;
+  --err: #f87171;
+  --err-surface: #16111a;
+  --err-border: #5b2a33;
+  --display: "Space Grotesk", -apple-system, "Segoe UI", sans-serif;
+  --body: "Inter", -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --pixel: "Silkscreen", var(--mono);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border-radius: 0 !important;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink-2);
+  font-family: var(--body);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+img {
+  image-rendering: pixelated;
+}
+
+img.ui-screenshot,
+.media img.ui-screenshot,
+.lightbox img {
+  image-rendering: auto !important;
+}
+
+img, video {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  padding: 10px 16px;
+  z-index: 200;
+}
+.skip:focus {
+  left: 8px;
+  top: 8px;
+}
+
+.container {
+  width: 100%;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+@media (min-width: 768px) {
+  .container {
+    padding: 0 40px;
+  }
+}
+
+/* NAVIGATION - CLEAN, SPACED, ZERO COLLISION */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule);
+  padding: 14px 0;
+}
+.nav__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.nav__left {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ink);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.32rem;
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
+}
+.brand img {
+  width: 38px;
+  height: 38px;
+  display: block;
+}
+.nav__links {
+  display: none;
+  align-items: center;
+  gap: 22px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--muted);
+  white-space: nowrap;
+}
+@media (min-width: 1024px) {
+  .nav__links {
+    display: flex;
+  }
+}
+.nav__links a:hover {
+  color: var(--ink);
+}
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--pixel);
+  font-size: 0.65rem;
+  color: var(--ink-2);
+  background: var(--surface);
+  border: 2px solid var(--rule);
+  padding: 6px 12px;
+  white-space: nowrap;
+}
+@media (max-width: 560px) {
+  .status {
+    display: none;
+  }
+}
+.status i {
+  width: 7px;
+  height: 7px;
+  background: var(--ok);
+  flex: none;
+  animation: blink 1.6s steps(2, jump-none) infinite;
+}
+@keyframes blink {
+  50% { opacity: 0.2; }
+}
+
+.section--hero {
+  padding-top: 72px;
+}
+
+/* TYPOGRAPHY */
+h1, h2 {
+  font-family: var(--display);
+  color: var(--ink);
+  letter-spacing: -0.03em;
+  font-weight: 700;
+}
+h1 {
+  font-size: clamp(2.4rem, 5.2vw, 4.1rem);
+  line-height: 1.05;
+  max-width: 22ch;
+}
+h2 {
+  font-size: clamp(1.8rem, 3.6vw, 2.6rem);
+  line-height: 1.15;
+  max-width: 26ch;
+}
+h3 {
+  font-family: var(--display);
+  color: var(--ink);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.lede {
+  font-size: clamp(1.05rem, 1.9vw, 1.25rem);
+  line-height: 1.55;
+  margin-top: 18px;
+  max-width: 62ch;
+}
+.kicker {
+  font-family: var(--pixel);
+  font-size: 0.72rem;
+  color: var(--accent);
+  margin-bottom: 14px;
+  display: block;
+  letter-spacing: 0.05em;
+}
+.caption {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.section {
+  padding: 88px 0;
+  border-bottom: 1px solid var(--rule-sub);
+}
+@media (min-width: 1024px) {
+  .section {
+    padding: 120px 0;
+  }
+}
+
+/* BUTTONS */
+.btn {
+  font-family: var(--pixel);
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  padding: 11px 16px;
+  border: 2px solid var(--accent-dim);
+  background: var(--surface-2);
+  color: var(--ink);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform 0.15s, background 0.15s, border-color 0.15s, color 0.15s;
+}
+.btn:hover {
+  transform: translate(-2px, -2px);
+  border-color: var(--accent);
+  background: var(--elev);
+  color: var(--ink);
+}
+.btn--hot {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+.btn--hot:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  color: var(--accent-ink);
+}
+
+/* FRAMES & SHOWCASES */
+.frame,
+.timeline-showcase {
+  background: var(--surface);
+  border: 2px solid var(--rule);
+  margin-top: 40px;
+  overflow: hidden;
+}
+.frame__bar,
+.timeline-showcase__bar,
+.custom-card__head,
+.explorer__head,
+.code__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  color: var(--muted);
+  flex-wrap: wrap;
+}
+.frame__bar strong,
+.timeline-showcase__bar strong,
+.custom-card__head strong,
+.explorer__head strong,
+.code__head strong {
+  color: var(--ink);
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.frame__bar strong::before,
+.timeline-showcase__bar strong::before,
+.custom-card__head strong::before,
+.explorer__head strong::before,
+.code__head strong::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+.frame__screen {
+  background: #000;
+  position: relative;
+  overflow: hidden;
+}
+.frame__screen video {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16/9;
+  object-fit: contain;
+  background: #000;
+}
+.frame__meta,
+.timeline-showcase__foot,
+.custom-card__foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 16px;
+  border-top: 1px solid var(--rule);
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  color: var(--muted);
+  background: var(--surface-2);
+}
+.frame__meta--standalone {
+  margin-top: 20px;
+  border: 2px solid var(--rule);
+}
+.frame__meta .ok,
+.timeline-showcase__foot .ok,
+.custom-card__foot .ok,
+.why-table td.ok {
+  color: var(--ok);
+  font-weight: 500;
+}
+.frame__progress {
+  height: 3px;
+  background: var(--rule);
+  width: 100%;
+  position: relative;
+}
+.frame__progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.1s linear;
+}
+
+/* REC BLINKING DOT */
+.rec-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--err);
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  font-weight: 500;
+}
+.rec-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--err);
+  display: inline-block;
+  animation: recBlink 1s steps(2, jump-none) infinite;
+}
+@keyframes recBlink {
+  50% { opacity: 0.15; }
+}
+
+.custom-player {
+  background: var(--surface);
+  border: 2px solid var(--rule);
+  position: relative;
+}
+.frame > .custom-player {
+  border: 0;
+}
+.custom-player:fullscreen {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #000;
+  border: 0;
+}
+.custom-player:fullscreen .custom-player__screen {
+  flex: 1;
+  min-height: 0;
+}
+.custom-player__screen {
+  position: relative;
+  background: #000;
+  overflow: hidden;
+  aspect-ratio: 16/9;
+  cursor: pointer;
+}
+.custom-player__screen video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.custom-player__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.35);
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+.custom-player__overlay.hidden {
+  opacity: 0;
+}
+.custom-player__big-play {
+  font-family: var(--pixel);
+  font-size: 1rem;
+  padding: 16px 28px;
+  background: var(--surface-2);
+  color: var(--accent);
+  border: 2px solid var(--accent);
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  transition: transform 0.15s, background 0.15s;
+}
+.custom-player__big-play:hover {
+  transform: scale(1.05);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.custom-player__bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 16px;
+  background: var(--surface-2);
+  border-top: 1px solid var(--rule);
+  font-family: var(--mono);
+}
+.player-btn {
+  font-family: var(--pixel);
+  font-size: 0.65rem;
+  background: var(--surface);
+  border: 2px solid var(--rule);
+  color: var(--ink);
+  padding: 7px 12px;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s, background 0.15s;
+}
+.player-btn:hover {
+  border-color: var(--accent);
+  background: var(--elev);
+}
+.player-play-btn {
+  width: 76px;
+  min-width: 76px;
+  text-align: center;
+}
+.player-icon-btn {
+  width: 32px;
+  height: 28px;
+  padding: 0;
+}
+.player-icon-btn svg {
+  display: block;
+  color: var(--ink-2);
+  transition: color 0.15s;
+}
+.player-icon-btn:hover svg {
+  color: var(--accent);
+}
+.player-timeline {
+  flex: 1;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  padding: 0 4px;
+  touch-action: none;
+}
+.player-track {
+  width: 100%;
+  height: 5px;
+  background: var(--elev);
+  border: 1px solid var(--rule);
+  position: relative;
+}
+.player-timeline:hover .player-track {
+  height: 7px;
+}
+.player-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  position: relative;
+}
+.player-thumb {
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 16px;
+  background: var(--ink);
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 8px rgba(38, 168, 255, 0.6);
+  cursor: grab;
+  transition: transform 0.1s ease, background 0.1s ease;
+  z-index: 2;
+}
+.player-timeline:hover .player-thumb,
+.player-thumb.grabbing {
+  transform: translateY(-50%) scale(1.15);
+  background: var(--ink);
+  box-shadow: 0 0 12px rgba(38, 168, 255, 0.95);
+}
+.player-thumb.grabbing {
+  cursor: grabbing;
+}
+.player-time {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* FACTS GRID */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-top: 20px;
+}
+@media (min-width: 800px) {
+  .facts {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.fact {
+  background: var(--surface);
+  border: 2px solid var(--rule);
+  padding: 18px;
+  transition: transform 0.18s ease, border-color 0.18s ease;
+}
+.fact:hover {
+  transform: translate(-2px, -2px);
+  border-color: var(--accent);
+}
+.fact b {
+  display: block;
+  font-family: var(--pixel);
+  font-weight: 400;
+  font-size: 1.25rem;
+  color: var(--ink);
+  letter-spacing: 0;
+  line-height: 1.3;
+}
+.fact span {
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  color: var(--muted);
+  display: block;
+  margin-top: 6px;
+  line-height: 1.45;
+}
+
+/* TIMECODE JUMP BAR */
+.jump-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--surface-2);
+  border-top: 1px solid var(--rule);
+}
+@media (min-width: 720px) {
+  .jump-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.jump-btn {
+  background: var(--surface);
+  border: 2px solid var(--rule);
+  padding: 10px 12px;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--ink-2);
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+}
+.jump-btn:hover {
+  border-color: var(--accent);
+  background: var(--elev);
+  transform: translateY(-1px);
+}
+.jump-btn.active {
+  border-color: var(--accent);
+  background: var(--elev);
+  color: var(--ink);
+}
+.jump-btn span {
+  font-family: var(--pixel);
+  font-size: 0.65rem;
+  color: var(--accent);
+}
+
+/* CUSTOM ASSETS SECTION (READY PRODUCTION CLIPS) */
+.custom-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin-top: 40px;
+}
+@media (min-width: 900px) {
+  .custom-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.custom-card {
+  background: var(--surface);
+  border: 2px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.18s ease, border-color 0.18s ease;
+}
+.custom-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+}
+.custom-card__head span {
+  font-family: var(--pixel);
+  font-size: 0.62rem;
+  color: var(--accent);
+}
+.custom-card__video {
+  background: #000;
+  position: relative;
+  overflow: hidden;
+}
+.custom-card__video video {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: contain;
+  background: #000;
+}
+.custom-card__body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+.custom-card__body h4 {
+  font-family: var(--display);
+  font-size: 1.15rem;
+  color: var(--ink);
+}
+.custom-card__body p {
+  font-size: 0.92rem;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+
+/* BULK CRAFTING GRID (ALL 16 RECIPES) */
+.bulk-grid-16 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin-top: 40px;
+}
+@media (min-width: 600px) {
+  .bulk-grid-16 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 900px) {
+  .bulk-grid-16 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (min-width: 1100px) {
+  .bulk-grid-16 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.bulk-card {
+  background: var(--surface);
+  border: 2px solid var(--rule);
+  overflow: hidden;
+  transition: transform 0.18s ease, border-color 0.18s ease;
+}
+.bulk-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+}
+.bulk-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--ink);
+  font-weight: 500;
+}
+.bulk-card__head span {
+  font-family: var(--pixel);
+  font-size: 0.58rem;
+  color: var(--accent);
+}
+.bulk-card__video {
+  background: #000;
+  position: relative;
+  overflow: hidden;
+}
+.bulk-card__video video {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: contain;
+  background: #000;
+}
+.bulk-card__foot {
+  padding: 7px 12px;
+  border-top: 1px solid var(--rule);
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+  background: var(--surface-2);
+}
+.bulk-card__foot span:last-child {
+  color: var(--ink-2);
+}
+
+/* COMPARE (MANUAL VS ENGINE) */
+.compare {
+  display: grid;
+  gap: 18px;
+  margin-top: 48px;
+}
+@media (min-width: 800px) {
+  .compare {
+    grid-template-columns: 1fr 1.15fr;
+  }
+}
+.vs-manual {
+  border: 2px solid var(--err-border);
+  background: var(--err-surface);
+  padding: 32px;
+}
+.vs-manual h3 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.vs-manual h3::before {
+  content: "";
+  width: 21px;
+  height: 21px;
+  flex: none;
+  background: var(--err);
+  background-clip: content-box;
+  padding: 5px;
+}
+.vs-engine {
+  border: 2px solid var(--ok-border);
+  background: var(--ok-surface);
+  padding: 32px;
+}
+.vs-engine h3 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ink);
+}
+.vs-engine h3::before {
+  content: "";
+  width: 21px;
+  height: 21px;
+  flex: none;
+  background: var(--ok);
+  background-clip: content-box;
+  padding: 5px;
+}
+.vs-list {
+  list-style: none;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-size: 0.95rem;
+}
+.vs-list li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.pix {
+  width: 21px;
+  height: 21px;
+  flex: none;
+  margin-top: 2px;
+  image-rendering: pixelated;
+}
+.vs-list span {
+  flex: 1;
+}
+
+/* HOW IT WORKS / TIMELINE FRAME */
+.pipe {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  margin-top: 40px;
+}
+@media (min-width: 900px) {
+  .pipe {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+.step {
+  background: var(--surface);
+  border: 2px solid var(--rule);
+  padding: 24px;
+}
+.step .n {
+  font-family: var(--pixel);
+  font-size: 0.68rem;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 10px;
+}
+.step h3 {
+  font-size: 1.15rem;
+  margin-bottom: 8px;
+}
+.step p {
+  font-size: 0.92rem;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+
+.timeline-showcase__screen {
+  background: #000;
+  position: relative;
+  overflow: hidden;
+  cursor: zoom-in;
+}
+.timeline-showcase__screen img {
+  width: 100%;
+  height: auto;
+  display: block;
+  image-rendering: auto !important;
+}
+
+/* CODE */
+.code {
+  background: var(--surface);
+  border: 2px solid var(--rule);
+  overflow: hidden;
+  margin-top: 32px;
+}
+.code pre {
+  padding: 18px;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  line-height: 1.75;
+  color: var(--ink-2);
+  overflow-x: auto;
+}
+.code .k { color: var(--accent); }
+.code .s { color: var(--ok); }
+.code .c { color: var(--muted); }
+.code .n { color: var(--warn); }
+
+/* EXPLORER (CLEAN LAYER STACK - NO THUMBNAIL DUMP) */
+.explorer {
+  margin-top: 48px;
+  background: var(--surface);
+  border: 2px solid var(--rule);
+}
+.explorer__stage {
+  display: grid;
+  gap: 0;
+}
+@media (min-width: 860px) {
+  .explorer__stage {
+    grid-template-columns: 1fr 300px;
+  }
+}
+.stage-view {
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  padding: 24px;
+  border-bottom: 1px solid var(--rule);
+}
+@media (min-width: 860px) {
+  .stage-view {
+    border-bottom: 0;
+    border-right: 1px solid var(--rule);
+    min-height: 420px;
+  }
+}
+.stage-view img {
+  max-height: 340px;
+  min-height: 120px;
+  width: auto;
+  max-width: 100%;
+  transition: opacity 0.18s ease;
+}
+.stage-view img.swap {
+  opacity: 0;
+}
+@media (min-width: 860px) {
+  .stage-view img {
+    max-height: 380px;
+  }
+}
+.stage-side {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.stage-name {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--ink);
+  word-break: break-all;
+}
+.stage-count {
+  font-family: var(--pixel);
+  font-size: 1rem;
+  color: var(--accent);
+}
+.stage-btns {
+  display: flex;
+  gap: 10px;
+}
+
+.filmstrip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 14px 16px;
+  background: var(--surface-2);
+  border-top: 1px solid var(--rule);
+}
+.chip {
+  font-family: var(--pixel);
+  font-size: 0.62rem;
+  padding: 7px 9px;
+  background: var(--surface);
+  border: 2px solid var(--rule);
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s, transform 0.15s;
+}
+.chip:hover {
+  color: var(--ink);
+  background: var(--elev);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+.chip[aria-current="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 40px;
+}
+.why-table {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+  background: var(--surface);
+  border: 2px solid var(--rule);
+  font-size: 0.92rem;
+}
+.why-table th, .why-table td {
+  padding: 16px 20px;
+  border: 1px solid var(--rule);
+  text-align: left;
+}
+.why-table th {
+  background: var(--surface-2);
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+.why-table td strong {
+  color: var(--ink);
+}
+.why-table td.ok {
+  color: var(--ok);
+  font-weight: 500;
+}
+.why-table td.err {
+  color: var(--err);
+}
+
+.spec-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-top: 40px;
+}
+@media (min-width: 720px) {
+  .spec-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+.spec-card {
+  background: var(--surface);
+  border: 2px solid var(--rule);
+  padding: 22px;
+}
+
+.footer__link {
+  color: var(--accent);
+}
+.footer__link:hover {
+  color: var(--accent-hover);
+}
+.spec-card h4 {
+  font-family: var(--pixel);
+  font-size: 0.8rem;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.spec-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+}
+.spec-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  border-bottom: 1px solid var(--rule-sub);
+  padding-bottom: 6px;
+}
+.spec-list span {
+  color: var(--muted);
+}
+.spec-list strong {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+/* CTA */
+.cta-box {
+  background: var(--surface);
+  border: 2px solid var(--rule);
+  padding: 40px 24px;
+  text-align: center;
+  margin-top: 40px;
+}
+@media (min-width: 768px) {
+  .cta-box {
+    padding: 64px 48px;
+  }
+}
+.cta-box h2 {
+  margin: 0 auto;
+}
+.cta-box p {
+  margin: 16px auto 32px;
+  max-width: 50ch;
+}
+.cta-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* FOOTER - ZERO PERSONAL NAMES */
+.footer {
+  padding: 64px 0 48px;
+  background: var(--paper);
+  border-top: 1px solid var(--rule);
+}
+.footer__big {
+  font-family: var(--display);
+  font-size: clamp(1.4rem, 2.8vw, 2rem);
+  color: var(--ink);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.footer__pixel {
+  font-family: var(--pixel);
+  font-size: 0.72rem;
+  color: var(--accent);
+  margin-top: 12px;
+}
+.footer__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule-sub);
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--muted);
+  flex-wrap: wrap;
+}
+.footer__nav {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.footer__nav a:hover {
+  color: var(--ink);
+}
+
+/* LIGHTBOX */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.92);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  cursor: zoom-out;
+}
+.lightbox.open {
+  display: flex;
+}
+.lightbox__frame {
+  max-width: 95vw;
+  max-height: 95vh;
+  border: 2px solid var(--rule);
+  background: #000;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+}
+.lightbox__frame img {
+  max-width: 95vw;
+  max-height: 95vh;
+  width: auto;
+  height: auto;
+  display: block;
+  image-rendering: auto !important;
+}
+
+/* REVEAL ANIMATIONS */
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+.reveal.in {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal[data-d="1"] { transition-delay: 0.07s; }
+.reveal[data-d="2"] { transition-delay: 0.14s; }
+.reveal[data-d="3"] { transition-delay: 0.21s; }
+.reveal[data-d="4"] { transition-delay: 0.28s; }
+.reveal[data-d="5"] { transition-delay: 0.35s; }
+</style>
+</head>
+<body>
+
+<a href="#hero" class="skip">Skip to content</a>
+
+<!-- NAV - CLEAN, CONCISE, ZERO OVERLAP -->
+<header class="nav">
+  <div class="container nav__inner">
+    <div class="nav__left">
+      <a href="#hero" class="brand">
+        <img src="assets/logov4.png" alt="AgentMotion Logo" width="38" height="38">
+        <span>AgentMotion</span>
+      </a>
+      <nav class="nav__links" aria-label="Primary Navigation">
+        <a href="#live-proof">Live Demo</a>
+        <a href="#custom-assets">Custom UI</a>
+        <a href="#bulk-crafting">Bulk (16)</a>
+        <a href="#pain">Workflow</a>
+        <a href="#pipeline">Pipeline</a>
+        <a href="#layers">Layers</a>
+        <a href="#specs">Specs</a>
+      </nav>
+    </div>
+    <div class="status"><i></i><span>PREMIERE PRO 2026 EXTENSION</span></div>
+  </div>
+</header>
+
+<main>
+
+<!-- SECTION 1: HERO (CALCULATOR UI AS MAIN) -->
+<section id="hero" class="section section--hero">
+  <div class="container">
+    <span class="kicker reveal">BUILT FOR MINECRAFT YOUTUBERS & GAMING VIDEO EDITORS</span>
+    <h1 class="reveal" data-d="1">Stop making animations by hand. Build them in seconds with editable keyframes in Premiere Pro.</h1>
+    <p class="lede reveal" data-d="2">
+      The fastest way to animate Minecraft interfaces. From text prompt to multi-track 60fps timeline with native Bezier keyframes in 1.7 seconds.
+    </p>
+
+    <div class="frame reveal" data-d="3">
+      <div class="frame__bar">
+        <strong>HERO SEQUENCE // CALC_SHINE 1080p60 // 19 VIDEO TRACKS</strong>
+        <span>1.7s CEP ASSEMBLY - NATIVE TIMELINE</span>
+      </div>
+      <div class="frame__screen">
+        <video id="heroVideo" src="assets/hero.mp4" poster="assets/hero-poster.png" autoplay loop muted playsinline></video>
+      </div>
+      <div class="frame__progress">
+        <div id="heroProg" class="frame__progress-bar"></div>
+      </div>
+      <div class="frame__meta">
+        <span>1920x1080 @ 60fps</span>
+        <span>19 Isolated Video Tracks (V1-V19)</span>
+        <span>Integer Scaled (NEAREST-only)</span>
+        <span class="ok">Native Sparse Bezier Keyframes</span>
+      </div>
+    </div>
+
+    <div class="facts reveal" data-d="4">
+      <div class="fact">
+        <b>1.7s</b>
+        <span>Premiere sequence assembly from click to timeline</span>
+      </div>
+      <div class="fact">
+        <b>60 FPS</b>
+        <span>Frame-accurate 60fps motion with integer pixel scaling</span>
+      </div>
+      <div class="fact">
+        <b>NEAREST</b>
+        <span>Zero blur, no bilinear filtering, pure Minecraft pixels</span>
+      </div>
+      <div class="fact">
+        <b>100% NATIVE</b>
+        <span>Editable Position, Scale &amp; Opacity keyframes</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 2: LIVE OBS PREMIERE PRO PROOF (CUSTOM BRUTALIST PLAYER + BLINKING REC + 4 TIMECODES) -->
+<section id="live-proof" class="section">
+  <div class="container">
+    <span class="kicker reveal">UNCUT RECORDING // PREMIERE PRO 2026 INTEGRATION</span>
+    <h2 class="reveal" data-d="1">Uncut proof. From prompt to 6 Premiere Pro tracks in 1.7 seconds.</h2>
+    <p class="lede reveal" data-d="2">
+      Watch the panel take a text prompt, generate isolated PNG layers, and build a multi-track sequence with native Position, Scale, and Opacity keyframes.
+    </p>
+
+    <div class="frame reveal" data-d="3">
+      <div class="frame__bar">
+        <strong>OBS SCREEN CAPTURE // ADOBE PREMIERE PRO 2026 // UNCUT TIMELINE GENERATION</strong>
+        <span class="rec-badge"><i class="rec-dot"></i> REC 1080p60</span>
+      </div>
+
+      <!-- CUSTOM BRUTALIST VIDEO PLAYER -->
+      <div class="custom-player" id="obsCustomPlayer">
+        <div class="custom-player__screen" id="obsScreen">
+          <video id="obsVideo" src="assets/OBS SCENE.mp4" poster="assets/obs-poster.png" playsinline preload="metadata"></video>
+          <div class="custom-player__overlay" id="obsOverlay">
+            <button class="custom-player__big-play" id="obsBigPlay" type="button">PLAY LIVE DEMO</button>
+          </div>
+        </div>
+        <div class="custom-player__bar">
+          <button class="player-btn player-play-btn" id="obsPlayBtn" type="button">PLAY</button>
+          <div class="player-timeline" id="obsTimeline">
+            <div class="player-track">
+              <div class="player-fill" id="obsFill">
+                <div class="player-thumb" id="obsThumb" aria-label="Scrubber handle"></div>
+              </div>
+            </div>
+          </div>
+          <div class="player-time" id="obsTime">0:00 / 1:32</div>
+          <button class="player-btn player-icon-btn" id="obsFsBtn" type="button" aria-label="Toggle Fullscreen" title="Toggle Fullscreen">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
+              <path d="M2 6V2h4M14 6V2h-4M2 10v4h4M14 10v4h-4"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="jump-grid">
+        <button type="button" class="jump-btn active" data-time="0">
+          <span>01 - 0:00</span>
+          <strong>PROMPT INPUT</strong>
+        </button>
+        <button type="button" class="jump-btn" data-time="31">
+          <span>02 - 0:31</span>
+          <strong>COMPILING LAYERS</strong>
+        </button>
+        <button type="button" class="jump-btn" data-time="50">
+          <span>03 - 0:50</span>
+          <strong>1.7s TIMELINE INSERT</strong>
+        </button>
+        <button type="button" class="jump-btn" data-time="70">
+          <span>04 - 1:10</span>
+          <strong>KEYFRAME INSPECTION</strong>
+        </button>
+      </div>
+
+      <div class="frame__meta">
+        <span>Host: Adobe Premiere Pro 2026 (CEP Panel)</span>
+        <span>Engine: Cloud AI API + Local Python Renderer</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 3: GENERATE CUSTOM ASSETS THAT WOULD TAKE HOURS (KEYBOARD + SELL MODAL) -->
+<section id="custom-assets" class="section">
+  <div class="container">
+    <span class="kicker reveal">PROCEDURAL UI GENERATION // BEYOND FLAT MOCKUPS</span>
+    <h2 class="reveal" data-d="1">Generate custom assets that would take hours in Photoshop - then animate them in seconds.</h2>
+    <p class="lede reveal" data-d="2">
+      From a 60-key typing keyboard to custom trading menus. AgentMotion builds pixel-perfect interfaces from scratch and rigs every button, slot, and counter on its own Premiere Pro track.
+    </p>
+
+    <div class="custom-grid reveal" data-d="3">
+      <!-- READY CLIP 01: KEYBOARD ANIMATION -->
+      <div class="custom-card">
+        <div class="custom-card__head">
+          <strong>READY CLIP // MECHANICAL KEYBOARD</strong>
+          <span>60 FPS</span>
+        </div>
+        <div class="custom-card__video">
+          <video src="assets/keyboard.mp4" poster="assets/keyboard-preview.png" autoplay loop muted playsinline></video>
+        </div>
+        <div class="custom-card__body">
+          <h4>60-Key Procedural Minecraft Keyboard</h4>
+          <p>Every keycap sits on its own layer with authentic Minecraft bevels, press highlights, and +1px drop shadows. 4 hours of manual After Effects rigging reduced to one click.</p>
+        </div>
+        <div class="custom-card__foot">
+          <span>50+ INDIVIDUAL KEYCAP LAYERS</span>
+          <span class="ok">READY PRODUCTION ASSET</span>
+        </div>
+      </div>
+
+      <!-- READY CLIP 02: SELL MODAL ANIMATION -->
+      <div class="custom-card">
+        <div class="custom-card__head">
+          <strong>READY CLIP // SELL & BUY MODAL</strong>
+          <span>60 FPS</span>
+        </div>
+        <div class="custom-card__video">
+          <video id="sellVideo" src="assets/SELL ANIMATION.mp4" poster="assets/sell-poster.png" autoplay loop muted playsinline></video>
+        </div>
+        <div class="custom-card__body">
+          <h4>Complete In-Game Trading & Dialog Windows</h4>
+          <p>Crisp 16-bit inventory dialog with item slots, coin balance counters, and confirm buttons. Every layer is exported with full alpha transparency, ready to overlay directly onto raw Minecraft gameplay footage.</p>
+        </div>
+        <div class="custom-card__foot">
+          <span>ITEM SLOTS & CLICK STATES</span>
+          <span class="ok">READY PRODUCTION ASSET</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 4: BULK CRAFTING ENGINE (ALL 16 RECIPES SIMULTANEOUSLY) -->
+<section id="bulk-crafting" class="section">
+  <div class="container">
+    <span class="kicker reveal">MASS PRODUCTION // 1-CLICK BATCH RENDERING</span>
+    <h2 class="reveal" data-d="1">Bulk Crafting Engine. All 16 recipes generated simultaneously.</h2>
+    <p class="lede reveal" data-d="2">
+      Need 20 different crafting animations for a survival series, speedrun analysis, or tutorial? AgentMotion batch-renders every recipe with smooth 60fps easing and slide-out exits on separate video tracks.
+    </p>
+
+    <div class="bulk-grid-16 reveal" data-d="3">
+      <!-- 01: Diamond Sword -->
+      <div class="bulk-card">
+        <div class="bulk-card__head">
+          <strong>DIAMOND SWORD</strong>
+          <span>01</span>
+        </div>
+        <div class="bulk-card__video">
+          <video src="assets/showcase/CRAFT_DIAMOND_SWORD_01.mp4" loop muted playsinline preload="metadata"></video>
+        </div>
+        <div class="bulk-card__foot">
+          <span>5 TRACKS</span>
+          <span>ISOLATED LAYERS</span>
+        </div>
+      </div>
+
+      <!-- 02: Diamond Pickaxe -->
+      <div class="bulk-card">
+        <div class="bulk-card__head">
+          <strong>DIAMOND PICKAXE</strong>
+          <span>02</span>
+        </div>
+        <div class="bulk-card__video">
+          <video src="assets/showcase/CRAFT_PICKAXE_04.mp4" loop muted playsinline preload="metadata"></video>
+        </div>
+        <div class="bulk-card__foot">
+          <span>6 TRACKS</span>
+          <span>ISOLATED LAYERS</span>
+        </div>
+      </div>
+
+      <!-- 03: TNT Block -->
+      <div class="bulk-card">
+        <div class="bulk-card__head">
+          <strong>TNT BLOCK</strong>
+          <span>03</span>
+        </div>
+        <div class="bulk-card__video">
+          <video src="assets/showcase/CRAFT_TNT_01.mp4" loop muted playsinline preload="metadata"></video>
+        </div>
+        <div class="bulk-card__foot">
+          <span>10 TRACKS</span>
+          <span>ISOLATED LAYERS</span>
+        </div>
+      </div>
+
+      <!-- 04: Bow -->
+      <div class="bulk-card">
+        <div class="bulk-card__head">
+          <strong>BOW</strong>
+          <span>04</span>
+        </div>
+        <div class="bulk-card__video">
+          <video src="assets/showcase/CRAFT_BOW_01.mp4" loop muted playsinline preload="metadata"></video>
+        </div>
+        <div class="bulk-card__foot">
+          <span>8 TRACKS</span>
+          <span>ISOLATED LAYERS</span>
+        </div>
+      </div>
+
+      <!-- 05: Furnace -->
+      <div class="bulk-card">
+        <div class="bulk-card__head">
+          <strong>FURNACE</strong>
+          <span>05</span>
+        </div>
+        <div class="bulk-card__video">
+          <video src="assets/showcase/CRAFT_FURNACE_01.mp4" loop muted playsinline preload="metadata"></video>
+        </div>
+        <div class="bulk-card__foot">
+          <span>9 TRACKS</span>
+          <span>ISOLATED LAYERS</span>
+        </div>
+      </div>
+
+      <!-- 06: Bookshelf -->
+      <div class="bulk-card">
+        <div class="bulk-card__head">
+          <strong>BOOKSHELF</strong>
+          <span>06</span>
+        </div>
+        <div class="bulk-card__video">
+          <video src="assets/showcase/CRAFT_BOOKSHELF_01.mp4" loop muted playsinline preload="metadata"></video>
+        </div>
+        <div class="bulk-card__foot">
+          <span>10 TRACKS</span>
+          <span>ISOLATED LAYERS</span>
+        </div>
+      </div>
+
+      <!-- 07: Golden Pickaxe -->
+      <div class="bulk-card">
+        <div class="bulk-card__head">
+          <strong>GOLDEN PICKAXE</strong>
+          <span>07</span>
+        </div>
+        <div class="bulk-card__video">
+          <video src="assets/showcase/CRAFT_GOLDEN_PICKAXE_01.mp4" loop muted playsinline preload="metadata"></video>
+        </div>
+        <div class="bulk-card__foot">
+          <span>6 TRACKS</span>
+          <span>ISOLATED LAYERS</span>
+        </div>
+      </div>
+
+      <!-- 08: Diamond Helmet -->
+      <div class="bulk-card">
+        <div class="bulk-card__head">
+          <strong>DIAMOND HELMET</strong>
+          <span>08</span>
+        </div>
+        <div class="bulk-card__video">
+          <video src="assets/showcase/CRAFT_DIAMOND_HELMET_01.mp4" loop muted playsinline preload="metadata"></video>
+        </div>
+        <div class="bulk-card__foot">
+          <span>7 TRACKS</span>
+          <span>ISOLATED LAYERS</span>
+        </div>
+      </div>
+
+      <!-- 09: Note Block -->
+      <div class="bulk-card">
+        <div class="bulk-card__head">
+          <strong>NOTE BLOCK</strong>
+          <span>09</span>
+        </div>
+        <div class="bulk-card__video">
+          <video src="assets/showcase/CRAFT_NOTE_BLOCK_01.mp4" loop muted playsinline preload="metadata"></video>
+        </div>
+        <div class="bulk-card__foot">
+          <span>10 TRACKS</span>
+          <span>ISOLATED LAYERS</span>
+        </div>
+      </div>
+
+      <!-- 10: Iron Axe -->
+      <div class="bulk-card">
+        <div class="bulk-card__head">
+          <strong>IRON AXE</strong>
+          <span>10</span>
+        </div>
+        <div class="bulk-card__video">
+          <video src="assets/showcase/CRAFT_IRON_AXE_01.mp4" loop muted playsinline preload="metadata"></video>
+        </div>
+        <div class="bulk-card__foot">
+          <span>6 TRACKS</span>
+          <span>ISOLATED LAYERS</span>
+        </div>
+      </div>
+
+      <!-- 11: Iron Pickaxe -->
+      <div class="bulk-card">
+        <div class="bulk-card__head">
+          <strong>IRON PICKAXE</strong>
+          <span>11</span>
+        </div>
+        <div class="bulk-card__video">
+          <video src="assets/showcase/CRAFT_IRON_PICKAXE_01.mp4" loop muted playsinline preload="metadata"></video>
+        </div>
+        <div class="bulk-card__foot">
+          <span>6 TRACKS</span>
+          <span>ISOLATED LAYERS</span>
+        </div>
+      </div>
+
+      <!-- 12: Hay Bale -->
+      <div class="bulk-card">
+        <div class="bulk-card__head">
+          <strong>HAY BALE</strong>
+          <span>12</span>
+        </div>
+        <div class="bulk-card__video">
+          <video src="assets/showcase/CRAFT_HAY_01.mp4" loop muted playsinline preload="metadata"></video>
+        </div>
+        <div class="bulk-card__foot">
+          <span>10 TRACKS</span>
+          <span>ISOLATED LAYERS</span>
+        </div>
+      </div>
+
+      <!-- 13: Iron Bucket -->
+      <div class="bulk-card">
+        <div class="bulk-card__head">
+          <strong>IRON BUCKET</strong>
+          <span>13</span>
+        </div>
+        <div class="bulk-card__video">
+          <video src="assets/showcase/CRAFT_BUCKET_01.mp4" loop muted playsinline preload="metadata"></video>
+        </div>
+        <div class="bulk-card__foot">
+          <span>5 TRACKS</span>
+          <span>ISOLATED LAYERS</span>
+        </div>
+      </div>
+
+      <!-- 14: Jack o'Lantern -->
+      <div class="bulk-card">
+        <div class="bulk-card__head">
+          <strong>JACK O'LANTERN</strong>
+          <span>14</span>
+        </div>
+        <div class="bulk-card__video">
+          <video src="assets/showcase/CRAFT_JACK_O_LANTERN_01.mp4" loop muted playsinline preload="metadata"></video>
+        </div>
+        <div class="bulk-card__foot">
+          <span>4 TRACKS</span>
+          <span>ISOLATED LAYERS</span>
+        </div>
+      </div>
+
+      <!-- 15: Diamond Hoe -->
+      <div class="bulk-card">
+        <div class="bulk-card__head">
+          <strong>DIAMOND HOE</strong>
+          <span>15</span>
+        </div>
+        <div class="bulk-card__video">
+          <video src="assets/showcase/CRAFT_DIAMOND_HOE_01.mp4" loop muted playsinline preload="metadata"></video>
+        </div>
+        <div class="bulk-card__foot">
+          <span>5 TRACKS</span>
+          <span>ISOLATED LAYERS</span>
+        </div>
+      </div>
+
+      <!-- 16: Diamond Shovel -->
+      <div class="bulk-card">
+        <div class="bulk-card__head">
+          <strong>DIAMOND SHOVEL</strong>
+          <span>16</span>
+        </div>
+        <div class="bulk-card__video">
+          <video src="assets/showcase/CRAFT_DIAMOND_SHOVEL_01.mp4" loop muted playsinline preload="metadata"></video>
+        </div>
+        <div class="bulk-card__foot">
+          <span>4 TRACKS</span>
+          <span>ISOLATED LAYERS</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame__meta frame__meta--standalone reveal" data-d="4">
+      <span>All 16 recipe animations playing simultaneously in bulk mode</span>
+      <span class="ok">Zero Bilinear Resampling - Integer Scaling Only</span>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 5: MANUAL NIGHTMARE VS. AGENTMOTION -->
+<section id="pain" class="section">
+  <div class="container">
+    <span class="kicker reveal">THE EDITING BOTTLENECK</span>
+    <h2 class="reveal" data-d="1">Manual Minecraft keyframing is brutal.</h2>
+    <p class="lede reveal" data-d="2">
+      Editors spend hours slicing inventory grids, guessing pixel coordinates, and dragging Bezier handles across dozens of tracks. AgentMotion replaces that with one clean click.
+    </p>
+
+    <div class="compare reveal" data-d="3">
+      <div class="vs-manual">
+        <h3>MANUAL PREMIERE & AFTER EFFECTS HELL</h3>
+        <ul class="vs-list">
+          <li>
+            <img src="assets/icon-x.png" class="pix" alt="X" width="21" height="21">
+            <span><strong>15 to 30 minutes wasted per crafting sequence</strong> slicing assets, setting anchors, and positioning slot coordinates by eye.</span>
+          </li>
+          <li>
+            <img src="assets/icon-x.png" class="pix" alt="X" width="21" height="21">
+            <span><strong>Blurry, mushy pixel art</strong> caused by Premiere Pro's default bilinear sampling and fractional scaling coordinates.</span>
+          </li>
+          <li>
+            <img src="assets/icon-x.png" class="pix" alt="X" width="21" height="21">
+            <span><strong>Tedious keyframe copying:</strong> manually applying Bezier ease handles to 10+ item layers for every single recipe in the video.</span>
+          </li>
+          <li>
+            <img src="assets/icon-x.png" class="pix" alt="X" width="21" height="21">
+            <span><strong>Flat, uneditable video packs:</strong> when the YouTuber wants to swap Netherite for Diamond, you have to re-render the entire file.</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="vs-engine">
+        <h3>THE AGENTMOTION PIPELINE</h3>
+        <ul class="vs-list">
+          <li>
+            <img src="assets/icon-check.png" class="pix" alt="Check" width="21" height="21">
+            <span><strong>1.7 seconds timeline assembly:</strong> from a prompt or recipe name directly to a multi-track sequence in Premiere Pro 2026.</span>
+          </li>
+          <li>
+            <img src="assets/icon-check.png" class="pix" alt="Check" width="21" height="21">
+            <span><strong>Byte-identical NEAREST-only rendering:</strong> exact integer scales, authentic Minecraft drop shadows (+1, +1 px), and sharp font kerning.</span>
+          </li>
+          <li>
+            <img src="assets/icon-check.png" class="pix" alt="Check" width="21" height="21">
+            <span><strong>100% native Premiere keyframes:</strong> sparse Bezier curves or baked frames directly on Position, Scale, and Opacity properties.</span>
+          </li>
+          <li>
+            <img src="assets/icon-check.png" class="pix" alt="Check" width="21" height="21">
+            <span><strong>Every layer isolated:</strong> re-time, swap, disable, or adjust any item or background layer right inside Premiere Pro.</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 6: HOW IT WORKS & FIXED PREMIERE PRO SCREENSHOT (NEW SS) -->
+<section id="pipeline" class="section">
+  <div class="container">
+    <span class="kicker reveal">WORKFLOW ARCHITECTURE // 3 STEPS TO TIMELINE</span>
+    <h2 class="reveal" data-d="1">How it builds native Premiere Pro sequences.</h2>
+    <p class="lede reveal" data-d="2">
+      Type what you need or pick a preset. The engine generates crisp PNG layers and builds a ready-to-edit 60fps sequence right inside Premiere Pro.
+    </p>
+
+    <ol class="pipe reveal" data-d="3">
+      <li class="step">
+        <span class="n">STEP 01 - SCENE DEFINITION</span>
+        <h3>Cloud AI Prompt or Recipe Table</h3>
+        <p>Describe your animation in plain English or pick a crafting preset. The engine calculates exact slot coordinates, item timings, and motion curves automatically.</p>
+      </li>
+      <li class="step">
+        <span class="n">STEP 02 - PIXEL-PERFECT RENDER</span>
+        <h3>Crisp PNG Layers + Manifest</h3>
+        <p>Generates tight, alpha-channel PNG layers at exact integer scales alongside a frame-accurate manifest.json. Zero blur, zero artifacts.</p>
+      </li>
+      <li class="step">
+        <span class="n">STEP 03 - 1.7s CEP ASSEMBLY</span>
+        <h3>Instant Premiere Pro Timeline</h3>
+        <p>The CEP extension reads the manifest, creates a 60fps sequence, places every asset on its own video track (V1-V20), and writes native Position, Scale, and Opacity keyframes.</p>
+      </li>
+    </ol>
+
+    <!-- NEW PREMIERE PRO SCREENSHOT FROM USER (CALC_SHINE_V2 WITH READY CEP PANEL) -->
+    <div class="timeline-showcase reveal" data-d="4">
+      <div class="timeline-showcase__bar">
+        <strong>ADOBE PREMIERE PRO 2026 // SEQUENCE: "CALC_SHINE_V2 1080p" // V1-V20 TRACKS</strong>
+        <span>CLICK IMAGE TO ENLARGE (1920x1080)</span>
+      </div>
+      <div class="timeline-showcase__screen" id="timelineZoomTrigger">
+        <img class="ui-screenshot" src="assets/premiere-timeline-new.png" alt="Adobe Premiere Pro 2026 timeline with CALC_SHINE_V2 assembled clips and native keyframes" width="1920" height="1080" data-zoom tabindex="0">
+      </div>
+      <div class="timeline-showcase__foot">
+        <span class="caption">Sequence assembled in 1.7s: 41 clips, 48 keyframes across 20 video tracks with live AgentMotion CEP panel.</span>
+        <span class="ok">100% NATIVE & EDITABLE IN PREMIERE PRO</span>
+      </div>
+    </div>
+
+    <!-- CODE BLOCK -->
+    <div class="code reveal" data-d="5">
+      <div class="code__head">
+        <strong>manifest.json // mcgui/manifest@1</strong>
+        <span class="c">single source of truth</span>
+      </div>
+<pre><code>{
+  <span class="k">"schema"</span>: <span class="s">"mcgui/manifest@1"</span>,
+  <span class="k">"scene_id"</span>: <span class="s">"CALC_SHINE"</span>,
+  <span class="k">"canvas"</span>: { <span class="k">"w"</span>: <span class="n">1920</span>, <span class="k">"h"</span>: <span class="n">1080</span> },
+  <span class="k">"fps"</span>: <span class="n">60</span>, <span class="k">"duration"</span>: <span class="n">343</span>,
+  <span class="k">"tracks"</span>: [ {
+    <span class="k">"v"</span>: <span class="n">1</span>, <span class="k">"name"</span>: <span class="s">"screen"</span>,
+    <span class="k">"clips"</span>: [ {
+      <span class="k">"id"</span>: <span class="s">"screen#1"</span>,
+      <span class="k">"file"</span>: <span class="s">"layers/V01_screen_1.png"</span>,
+      <span class="k">"start"</span>: <span class="n">0</span>, <span class="k">"end"</span>: <span class="n">343</span>,
+      <span class="k">"size"</span>: [<span class="n">464</span>, <span class="n">536</span>],
+      <span class="k">"rest"</span>: { <span class="k">"position"</span>: [<span class="n">960</span>, <span class="n">540</span>], <span class="k">"scale"</span>: <span class="n">100</span> },
+      <span class="k">"keys"</span>: { <span class="k">"position"</span>: [
+        { <span class="k">"t"</span>: <span class="n">0</span>, <span class="k">"v"</span>: [<span class="n">960</span>, <span class="n">1448</span>], <span class="k">"i"</span>: <span class="s">"ease_out"</span> },
+        { <span class="k">"t"</span>: <span class="n">30</span>, <span class="k">"v"</span>: [<span class="n">960</span>, <span class="n">540</span>], <span class="k">"i"</span>: <span class="s">"hold"</span> } ] },
+      <span class="k">"file_sha256"</span>: <span class="s">"b0d6852b06fe…"</span>,
+      <span class="k">"pixel_hash"</span>: <span class="s">"f4c0092cbda7…"</span>
+    } ]
+  } <span class="c">/* +18 tracks, 35 clips */</span> ]
+}</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 7: RAW LAYER STACK INSPECTOR (CLEAN - NO THUMBNAIL DUMP) -->
+<section id="layers" class="section">
+  <div class="container">
+    <span class="kicker reveal">ZERO FLATTENED FOOTAGE // TRANSPARENCY BY DESIGN</span>
+    <h2 class="reveal" data-d="1">Layer stack: 38 engine exports, take it apart.</h2>
+    <p class="lede reveal" data-d="2">
+      AgentMotion never renders flat, uneditable MP4 blocks. Every slot, button, font glyph, and cursor is rendered as an isolated PNG with full alpha transparency.
+    </p>
+
+    <!-- LIVE THING: layer stack explorer over all 38 real exports -->
+    <div class="explorer reveal" data-d="3">
+      <div class="explorer__head">
+        <strong>CALC_SHINE - 38 layers extracted from native sequence</strong>
+        <span>arrow keys work - click any layer chip</span>
+      </div>
+      <div class="explorer__stage">
+        <div class="stage-view">
+          <img id="stageImg" src="assets/layers/V01_screen_1.png" alt="V01_screen_1.png">
+        </div>
+        <div class="stage-side">
+          <span class="stage-count" id="stageCount">01 / 38</span>
+          <span class="stage-name" id="stageName">V01_screen_1.png</span>
+          <span class="caption" id="stageCtx">group SCREEN - frame 1 of 1</span>
+          <span class="caption">Tight PNG with alpha, direct engine export. Track and component part are in the filename.</span>
+          <div class="stage-btns">
+            <button class="btn" id="prevBtn" type="button">Prev</button>
+            <button class="btn btn--hot" id="nextBtn" type="button">Next</button>
+          </div>
+        </div>
+      </div>
+      <div class="filmstrip" id="filmstrip" role="list"></div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 8: SPECS & WHY NATIVE TIMELINES WIN -->
+<section id="specs" class="section">
+  <div class="container">
+    <span class="kicker reveal">ENGINEERING BENCHMARKS // CLOUD AI API + CEP</span>
+    <h2 class="reveal" data-d="1">Why native timelines beat pre-rendered video templates.</h2>
+    <p class="lede reveal" data-d="2">
+      Comparing traditional video asset packs and web generators against the AgentMotion cloud API + local CEP pipeline.
+    </p>
+
+    <div class="table-wrap reveal" data-d="3">
+      <table class="why-table">
+        <thead>
+          <tr>
+            <th>CAPABILITY</th>
+            <th>FLAT MP4 PACKS</th>
+            <th>AFTER EFFECTS MOGRTS</th>
+            <th>AGENTMOTION CEP</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Track Modularity</strong></td>
+            <td class="err">Flattened 1 track</td>
+            <td>Precomposed box</td>
+            <td class="ok">100% Isolated V1-V20 Tracks</td>
+          </tr>
+          <tr>
+            <td><strong>Pixel Art Fidelity</strong></td>
+            <td class="err">Bilinear Blur / Resampled</td>
+            <td>Variable / Scaling Bugs</td>
+            <td class="ok">Crisp NEAREST-Only Integer Scale</td>
+          </tr>
+          <tr>
+            <td><strong>Assembly Speed</strong></td>
+            <td>Manual Drag & Drop</td>
+            <td>Slow Dynamic Link Render</td>
+            <td class="ok">1.7s One-Click CEP Insertion</td>
+          </tr>
+          <tr>
+            <td><strong>Bulk Crafting Support</strong></td>
+            <td class="err">Manual per file</td>
+            <td class="err">Manual per comp</td>
+            <td class="ok">Batch Render Dozens at Once</td>
+          </tr>
+          <tr>
+            <td><strong>Pipeline Architecture</strong></td>
+            <td>Static local video files</td>
+            <td>Local After Effects engine</td>
+            <td class="ok">Cloud AI API + Local CEP Extension</td>
+          </tr>
+          <tr>
+            <td><strong>Post-Assembly Editing</strong></td>
+            <td class="err">Cannot edit items</td>
+            <td>Limited slider controls</td>
+            <td class="ok">Native Keyframes & Editable Clips</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="spec-grid reveal" data-d="4">
+      <div class="spec-card">
+        <h4>ENGINEERING RIGOR</h4>
+        <ul class="spec-list">
+          <li><span>Unit Test Suite</span><strong>337 / 337 Passing</strong></li>
+          <li><span>Pipeline Connection</span><strong>Online AI Cloud API</strong></li>
+          <li><span>Verification</span><strong>Byte-Identical SHA-256</strong></li>
+          <li><span>Local Integration</span><strong>CEP Extension Panel</strong></li>
+        </ul>
+      </div>
+      <div class="spec-card">
+        <h4>TIMELINE SPECS</h4>
+        <ul class="spec-list">
+          <li><span>Premiere Assembly Time</span><strong>1.7 Seconds</strong></li>
+          <li><span>Target Framerate</span><strong>60 FPS Native</strong></li>
+          <li><span>Standard Canvas</span><strong>1920x1080 (16:9)</strong></li>
+          <li><span>Shorts / Vertical Canvas</span><strong>1080x1920 (9:16)</strong></li>
+        </ul>
+      </div>
+      <div class="spec-card">
+        <h4>MOTION & EASING</h4>
+        <ul class="spec-list">
+          <li><span>Keyframe Handles</span><strong>Native Bezier Curves</strong></li>
+          <li><span>Exit Motion</span><strong>Slide-Out Down</strong></li>
+          <li><span>Font Rendering</span><strong>True Minecraft Bitmap</strong></li>
+          <li><span>Keyframe Mode</span><strong>Sparse Bezier / Baked</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 9: EARLY ACCESS & CTA -->
+<section id="early-access" class="section">
+  <div class="container">
+    <div class="cta-box reveal">
+      <span class="kicker">LIMITED ACCESS</span>
+      <h2>Cut hours of manual keyframing from every upload.</h2>
+      <p class="lede">
+        AgentMotion is currently in private testing with high-volume Minecraft creators and video editors. Request access to the Premiere Pro 2026 CEP extension and bulk generator.
+      </p>
+      <div class="cta-actions">
+        <a href="mailto:mateusz@agentmotion.tech?subject=AgentMotion%20Early%20Access%20Request" class="btn btn--hot">Request Early Access</a>
+        <button id="copyEmailBtn" class="btn" type="button">Copy Email (mateusz@agentmotion.tech)</button>
+        <a href="#live-proof" class="btn">Watch Live Demo</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- FOOTER - CLEAN, ZERO PERSONAL DATA -->
+<footer class="footer">
+  <div class="container">
+    <p class="footer__big">Pixel-perfect Minecraft UI. Native Premiere Pro timelines.</p>
+    <p class="footer__pixel">AGENTMOTION // BUILT FOR MINECRAFT CREATORS</p>
+    <div class="footer__meta">
+      <span>AgentMotion // Built for Minecraft Creators & Gaming Video Editors (<a href="mailto:mateusz@agentmotion.tech" class="footer__link">mateusz@agentmotion.tech</a>)</span>
+      <nav class="footer__nav" aria-label="Footer">
+        <a href="#hero">Hero</a>
+        <a href="#live-proof">Live Demo</a>
+        <a href="#custom-assets">Custom UI</a>
+        <a href="#bulk-crafting">Bulk Crafting</a>
+        <a href="#pain">Workflow</a>
+        <a href="#pipeline">Pipeline</a>
+        <a href="#layers">Layer Stack</a>
+        <a href="#specs">Specs</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+<!-- LIGHTBOX FOR PREMIERE PRO SCREENSHOT -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Enlarged screenshot viewer" aria-hidden="true">
+  <div class="lightbox__frame">
+    <img id="lightboxImg" src="assets/premiere-timeline-new.png" alt="Premiere Pro Timeline Enlarge">
+  </div>
+</div>
+
+<script>
+(function() {
+  // 1. SMART VIDEO OBSERVER - PREVENTS ANY BROWSER LAG
+  // Only play videos when they are physically visible inside viewport!
+  if ('IntersectionObserver' in window) {
+    var videoObs = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        var v = entry.target;
+        if (v.id === 'obsVideo') return; // Handled by custom player
+        if (entry.isIntersecting) {
+          var p = v.play();
+          if (p && p.catch) p.catch(function() {});
+        } else {
+          v.pause();
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('video').forEach(function(vid) {
+      if (vid.id !== 'obsVideo') videoObs.observe(vid);
+    });
+  }
+
+  // 2. HERO VIDEO PROGRESS BAR
+  var heroVideo = document.getElementById('heroVideo');
+  var heroProg = document.getElementById('heroProg');
+  if (heroVideo && heroProg) {
+    (function tick() {
+      if (heroVideo.duration) {
+        heroProg.style.width = (heroVideo.currentTime / heroVideo.duration * 100) + '%';
+      }
+      requestAnimationFrame(tick);
+    })();
+  }
+
+  // 3. CUSTOM BRUTALIST VIDEO PLAYER FOR OBS SCENE
+  var obsVideo = document.getElementById('obsVideo');
+  var obsScreen = document.getElementById('obsScreen');
+  var obsOverlay = document.getElementById('obsOverlay');
+  var obsBigPlay = document.getElementById('obsBigPlay');
+  var obsPlayBtn = document.getElementById('obsPlayBtn');
+  var obsTimeline = document.getElementById('obsTimeline');
+  var obsFill = document.getElementById('obsFill');
+  var obsTime = document.getElementById('obsTime');
+  var obsFsBtn = document.getElementById('obsFsBtn');
+  var jumpBtns = document.querySelectorAll('.jump-btn[data-time]');
+
+  function formatTime(s) {
+    var m = Math.floor(s / 60);
+    var sec = Math.floor(s % 60);
+    return m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+
+  function togglePlay() {
+    if (!obsVideo) return;
+    if (obsVideo.paused || obsVideo.ended) {
+      obsVideo.play().catch(function() {});
+    } else {
+      obsVideo.pause();
+    }
+  }
+
+  if (obsBigPlay) obsBigPlay.addEventListener('click', togglePlay);
+  if (obsScreen) obsScreen.addEventListener('click', function(e) {
+    if (e.target !== obsBigPlay) togglePlay();
+  });
+  if (obsPlayBtn) obsPlayBtn.addEventListener('click', togglePlay);
+
+  if (obsVideo) {
+    obsVideo.addEventListener('play', function() {
+      if (obsPlayBtn) obsPlayBtn.textContent = 'PAUSE';
+      if (obsOverlay) obsOverlay.classList.add('hidden');
+    });
+
+    obsVideo.addEventListener('pause', function() {
+      if (obsPlayBtn) obsPlayBtn.textContent = 'PLAY';
+      if (obsOverlay) obsOverlay.classList.remove('hidden');
+    });
+
+    obsVideo.addEventListener('timeupdate', function() {
+      var cur = obsVideo.currentTime || 0;
+      var dur = obsVideo.duration || 92.2;
+      if (obsFill) obsFill.style.width = (cur / dur * 100) + '%';
+      if (obsTime) obsTime.textContent = formatTime(cur) + ' / ' + formatTime(dur);
+
+      var currentIdx = 0;
+      if (cur >= 70) currentIdx = 3;
+      else if (cur >= 50) currentIdx = 2;
+      else if (cur >= 31) currentIdx = 1;
+      else currentIdx = 0;
+
+      jumpBtns.forEach(function(b, idx) {
+        b.classList.toggle('active', idx === currentIdx);
+      });
+    });
+
+    // Custom scrub timeline
+    if (obsTimeline) {
+      var isScrubbing = false;
+      var obsThumb = document.getElementById('obsThumb');
+      function scrub(e) {
+        var rect = obsTimeline.getBoundingClientRect();
+        var clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+        var pos = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+        if (obsVideo.duration) {
+          obsVideo.currentTime = pos * obsVideo.duration;
+        }
+      }
+      obsTimeline.addEventListener('pointerdown', function(e) {
+        isScrubbing = true;
+        if (obsThumb) obsThumb.classList.add('grabbing');
+        if (obsTimeline.setPointerCapture) {
+          try { obsTimeline.setPointerCapture(e.pointerId); } catch(err) {}
+        }
+        scrub(e);
+      });
+      window.addEventListener('pointermove', function(e) {
+        if (isScrubbing) scrub(e);
+      });
+      function endScrub(e) {
+        if (isScrubbing) {
+          isScrubbing = false;
+          if (obsThumb) obsThumb.classList.remove('grabbing');
+          if (obsTimeline.releasePointerCapture && e && e.pointerId) {
+            try { obsTimeline.releasePointerCapture(e.pointerId); } catch(err) {}
+          }
+        }
+      }
+      window.addEventListener('pointerup', endScrub);
+      window.addEventListener('pointercancel', endScrub);
+    }
+
+    // Fullscreen toggle
+    if (obsFsBtn) {
+      obsFsBtn.addEventListener('click', function() {
+        if (!document.fullscreenElement) {
+          var container = document.getElementById('obsCustomPlayer');
+          if (container && container.requestFullscreen) {
+            container.requestFullscreen();
+          } else if (obsVideo.requestFullscreen) {
+            obsVideo.requestFullscreen();
+          }
+        } else {
+          if (document.exitFullscreen) document.exitFullscreen();
+        }
+      });
+    }
+  }
+
+  // Chapter jump buttons
+  jumpBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var sec = parseFloat(btn.getAttribute('data-time') || '0');
+      jumpBtns.forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      if (obsVideo) {
+        obsVideo.currentTime = sec;
+        obsVideo.play().catch(function() {});
+      }
+    });
+  });
+
+  // 4. LAYER EXPLORER (CLEAN SYSTEM - NO DUMP)
+  var GROUPS = [
+    { key: "SCREEN", files: ["V01_screen_1.png"] },
+    { key: "DISPLAY", files: ["V02_display_1.png", "V02_display_2.png"] },
+    { key: "TEXT", files: ["V02_display_text_1.png", "V02_display_text_2.png", "V02_display_text_3.png", "V02_display_text_4.png", "V02_display_text_5.png", "V02_display_text_6.png"] },
+    { key: "7", files: ["V03_b7_1.png"] },
+    { key: "8", files: ["V04_b8_1.png"] },
+    { key: "9", files: ["V05_b9_1.png"] },
+    { key: "DIV", files: ["V06_b_div_1.png"] },
+    { key: "4", files: ["V07_b4_1.png"] },
+    { key: "5", files: ["V08_b5_1.png"] },
+    { key: "6", files: ["V09_b6_1.png"] },
+    { key: "MUL", files: ["V10_b_mul_1.png", "V10_b_mul_2.png", "V10_b_mul_3.png"] },
+    { key: "1", files: ["V11_b1_1.png", "V11_b1_2.png", "V11_b1_3.png", "V11_b1_4.png", "V11_b1_5.png"] },
+    { key: "2", files: ["V12_b2_1.png", "V12_b2_2.png", "V12_b2_3.png"] },
+    { key: "3", files: ["V13_b3_1.png"] },
+    { key: "SUB", files: ["V14_b_sub_1.png"] },
+    { key: "C", files: ["V15_b_clear_1.png"] },
+    { key: "0", files: ["V16_b0_1.png", "V16_b0_2.png", "V16_b0_3.png"] },
+    { key: "=", files: ["V17_b_eq_1.png", "V17_b_eq_2.png", "V17_b_eq_3.png"] },
+    { key: "+", files: ["V18_b_add_1.png"] },
+    { key: "CURSOR", files: ["V19_cursor_1.png"] }
+  ];
+
+  var files = [], meta = {};
+  GROUPS.forEach(function(g) {
+    g.files.forEach(function(f, idx) {
+      meta[f] = { key: g.key, at: idx + 1, of: g.files.length };
+      files.push(f);
+    });
+  });
+
+  var layerIdx = 0,
+      stageImg = document.getElementById('stageImg'),
+      stageName = document.getElementById('stageName'),
+      stageCtx = document.getElementById('stageCtx'),
+      stageCount = document.getElementById('stageCount'),
+      filmstrip = document.getElementById('filmstrip'),
+      seq = 0;
+
+  function pad(n) { return (n < 9 ? '0' : '') + (n + 1); }
+
+  function showLayer(n) {
+    layerIdx = (n + files.length) % files.length;
+    var my = ++seq;
+    var f = files[layerIdx];
+    var m = meta[f];
+    stageName.textContent = f;
+    stageCtx.textContent = 'group ' + m.key + ' - frame ' + m.at + ' of ' + m.of;
+    stageCount.textContent = pad(layerIdx) + ' / ' + files.length;
+    var ch = filmstrip.children;
+    for (var k = 0; k < ch.length; k++) {
+      ch[k].setAttribute('aria-current', k === layerIdx ? 'true' : 'false');
+    }
+    stageImg.classList.add('swap');
+    var ni = new Image();
+    ni.onload = function() {
+      if (my !== seq) return;
+      stageImg.src = 'assets/layers/' + f;
+      stageImg.alt = f;
+      stageImg.classList.remove('swap');
+    };
+    ni.onerror = function() {
+      if (my !== seq) return;
+      stageImg.classList.remove('swap');
+    };
+    ni.src = 'assets/layers/' + f;
+  }
+
+  files.forEach(function(f, idx) {
+    var b = document.createElement('button');
+    b.className = 'chip';
+    b.type = 'button';
+    b.textContent = f.replace('.png', '');
+    b.setAttribute('role', 'listitem');
+    b.setAttribute('aria-current', idx === 0 ? 'true' : 'false');
+    b.addEventListener('click', function() { showLayer(idx); });
+    filmstrip.appendChild(b);
+  });
+
+  document.getElementById('prevBtn').addEventListener('click', function() { showLayer(layerIdx - 1); });
+  document.getElementById('nextBtn').addEventListener('click', function() { showLayer(layerIdx + 1); });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    if (document.activeElement && ['INPUT', 'TEXTAREA', 'VIDEO'].indexOf(document.activeElement.tagName) !== -1) return;
+    var layersSec = document.getElementById('layers');
+    if (layersSec) {
+      var r = layersSec.getBoundingClientRect();
+      var inView = (r.top < window.innerHeight && r.bottom > 0);
+      if (!inView) return;
+    }
+    if (e.key === 'ArrowLeft') showLayer(layerIdx - 1);
+    else if (e.key === 'ArrowRight') showLayer(layerIdx + 1);
+  });
+
+  // 6. LIGHTBOX MODAL FOR PREMIERE PRO SCREENSHOT
+  var lb = document.getElementById('lightbox');
+  var lbImg = document.getElementById('lightboxImg');
+  var lastFocus = null;
+
+  function openLb(src, alt) {
+    lbImg.src = src;
+    lbImg.alt = alt || 'Enlarged image';
+    lastFocus = document.activeElement;
+    lb.classList.add('open');
+    lb.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLb() {
+    lb.classList.remove('open');
+    lb.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  lb.addEventListener('click', function(e) {
+    if (e.target === lb || e.target === lbImg) closeLb();
+  });
+
+  document.querySelectorAll('img[data-zoom]').forEach(function(im) {
+    im.addEventListener('click', function() { openLb(im.src, im.alt); });
+    im.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openLb(im.src, im.alt);
+      }
+    });
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && lb.classList.contains('open')) closeLb();
+  });
+
+  // 7. COPY EMAIL TO CLIPBOARD
+  var copyEmailBtn = document.getElementById('copyEmailBtn');
+  if (copyEmailBtn) {
+    copyEmailBtn.addEventListener('click', function() {
+      var email = 'mateusz@agentmotion.tech';
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(email).then(function() {
+          var orig = copyEmailBtn.textContent;
+          copyEmailBtn.textContent = 'COPIED TO CLIPBOARD!';
+          copyEmailBtn.style.borderColor = 'var(--ok)';
+          copyEmailBtn.style.color = 'var(--ok)';
+          setTimeout(function() {
+            copyEmailBtn.textContent = orig;
+            copyEmailBtn.style.borderColor = '';
+            copyEmailBtn.style.color = '';
+          }, 2500);
+        }).catch(function() {
+          window.location.href = 'mailto:' + email;
+        });
+      } else {
+        window.location.href = 'mailto:' + email;
+      }
+    });
+  }
+
+  // 8. SCROLL REVEAL OBSERVER
+  if ('IntersectionObserver' in window) {
+    var revIo = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          revIo.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(function(el) {
+      revIo.observe(el);
+    });
+  } else {
+    document.querySelectorAll('.reveal').forEach(function(el) {
+      el.classList.add('in');
+    });
+  }
+})();
+</script>
+</body>
+</html>

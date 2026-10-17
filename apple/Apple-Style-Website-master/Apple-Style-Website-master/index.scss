@@ -1,0 +1,32 @@
+
+// define a variable is SASS
+
+$background: #ed0a0a;
+
+
+@mixin makeCenter {
+    display: flex;
+    justify-content: center;
+}
+
+
+@import './second.scss';
+
+
+body {
+    margin: 0;
+    background-color: lightgray;
+}
+
+div.main{
+    background-color: lightcoral;
+    header{
+        padding: 5px;
+        @include makeCenter();
+        a{
+            margin-right: 10px;
+            text-decoration: none;
+            color: white;
+        }
+    }
+}

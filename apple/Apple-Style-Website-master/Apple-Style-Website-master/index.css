@@ -1,0 +1,27 @@
+div.second {
+  background-color: lightgreen;
+}
+div.second div {
+  display: flex;
+  justify-content: center;
+  color: brown;
+}
+
+body {
+  margin: 0;
+  background-color: lightgray;
+}
+
+div.main {
+  background-color: lightcoral;
+}
+div.main header {
+  padding: 5px;
+  display: flex;
+  justify-content: center;
+}
+div.main header a {
+  margin-right: 10px;
+  text-decoration: none;
+  color: white;
+}/*# sourceMappingURL=index.css.map */

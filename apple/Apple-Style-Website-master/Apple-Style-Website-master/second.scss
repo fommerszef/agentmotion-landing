@@ -1,0 +1,12 @@
+@mixin makeCenter {
+    display: flex;
+    justify-content: center;
+}
+
+div.second{
+    background-color: lightgreen;
+    div{
+         @include makeCenter();
+        color: brown;
+    }
+}

@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentMotion — Deterministic motion graphics for Minecraft creators</title>
+<meta name="description" content="A Python engine renders pixel-perfect Minecraft-style GUI layers. A Premiere Pro plugin assembles the timeline in one click. Pre-launch, local-first.">
+<link rel="icon" href="assets/logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Hallmark · genre: modern-minimal · macrostructure: Workbench · theme: Cobalt · enrichment: E1 demo video · nav: N9 · footer: Ft5 */
+
+:root {
+  /* Surface & Base (OKLCH) */
+  --color-paper: oklch(13.5% 0.008 260);
+  --color-surface: oklch(17.5% 0.012 260);
+  --color-surface-2: oklch(21.5% 0.015 260);
+  --color-surface-elevated: oklch(25.5% 0.018 260);
+
+  /* Typography Colors */
+  --color-ink: oklch(97% 0.003 260);
+  --color-ink-2: oklch(76% 0.008 260);
+  --color-ink-muted: oklch(54% 0.01 260);
+
+  /* Hairlines & Rules */
+  --color-rule: oklch(24% 0.012 260);
+  --color-rule-subtle: oklch(18.5% 0.008 260);
+
+  /* Signal Accents (Electric Cobalt, used <3% viewport) */
+  --color-accent: oklch(68% 0.19 250);
+  --color-accent-dim: oklch(28% 0.06 250);
+  --color-accent-ink: oklch(12% 0.02 250);
+  --color-success: oklch(72% 0.16 155);
+
+  /* Font Stacks */
+  --font-display: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Typography Scale */
+  --text-display: clamp(2.5rem, 6vw, 4.25rem);
+  --text-title: clamp(1.75rem, 3.5vw, 2.5rem);
+  --text-h3: 1.25rem;
+  --text-body: 1.0625rem;
+  --text-sm: 0.875rem;
+  --text-xs: 0.75rem;
+
+  /* 4-pt Spacing Scale */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 72px;
+  --space-4xl: 112px;
+  --space-5xl: 160px;
+
+  /* Radii & Motion */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  overflow-x: clip;
+  background-color: var(--color-paper);
+  color: var(--color-ink-2);
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+}
+
+img, video {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  image-rendering: pixelated;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+/* — Layout Container — */
+.container {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 var(--space-lg);
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 0 var(--space-2xl);
+  }
+}
+
+/* — N9 Edge-aligned Minimal Nav — */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background-color: oklch(13.5% 0.008 260 / 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-rule-subtle);
+  padding: var(--space-md) 0;
+}
+
+.nav__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--text-body);
+  letter-spacing: -0.01em;
+}
+
+.nav__brand img {
+  width: 22px;
+  height: 22px;
+}
+
+.nav__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xl);
+}
+
+.nav__links {
+  display: none;
+  gap: var(--space-lg);
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+}
+
+@media (min-width: 768px) {
+  .nav__links {
+    display: flex;
+  }
+}
+
+.nav__links a:hover {
+  color: var(--color-ink);
+}
+
+.badge-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+  background: var(--color-surface);
+  border: 1px solid var(--color-rule);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+}
+
+.badge-tag::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+
+/* — Typography Styles — */
+h1, h2, h3 {
+  font-family: var(--font-display);
+  color: var(--color-ink);
+  letter-spacing: -0.025em;
+  font-style: normal;
+}
+
+h1 {
+  font-size: var(--text-display);
+  line-height: 1.05;
+  font-weight: 700;
+  max-width: 22ch;
+}
+
+h2 {
+  font-size: var(--text-title);
+  line-height: 1.15;
+  font-weight: 600;
+}
+
+h3 {
+  font-size: var(--text-h3);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.lede {
+  font-size: clamp(1.125rem, 2vw, 1.25rem);
+  color: var(--color-ink-2);
+  line-height: 1.5;
+  max-width: 58ch;
+  margin-top: var(--space-lg);
+}
+
+.caption {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+  line-height: 1.5;
+}
+
+/* — Section Rhythm — */
+.section {
+  padding: var(--space-4xl) 0;
+  border-bottom: 1px solid var(--color-rule-subtle);
+}
+
+@media (min-width: 1024px) {
+  .section {
+    padding: var(--space-5xl) 0;
+  }
+}
+
+/* — Hero & Workbench Demo Canvas — */
+.hero {
+  padding-top: var(--space-3xl);
+  padding-bottom: var(--space-4xl);
+}
+
+.workbench-frame {
+  margin-top: var(--space-3xl);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: 0 20px 48px -16px oklch(0% 0 0 / 0.5);
+}
+
+.workbench-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) var(--space-md);
+  background-color: var(--color-surface-2);
+  border-bottom: 1px solid var(--color-rule);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+}
+
+.workbench-bar__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--color-ink-2);
+}
+
+.workbench-bar__title::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background-color: var(--color-accent);
+}
+
+.workbench-video-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-color: #000;
+}
+
+.workbench-video-wrapper video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.workbench-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  border-top: 1px solid var(--color-rule);
+  background-color: var(--color-surface);
+}
+
+/* — Facts Strip (Engineering Grounding) — */
+.facts-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-lg);
+  margin-top: var(--space-2xl);
+  padding-top: var(--space-2xl);
+  border-top: 1px solid var(--color-rule-subtle);
+}
+
+.fact-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.fact-item__val {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  letter-spacing: -0.02em;
+}
+
+.fact-item__label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+  margin-top: 2px;
+}
+
+/* — Split Narrative Sections — */
+.split-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2xl);
+  align-items: start;
+}
+
+@media (min-width: 960px) {
+  .split-layout {
+    grid-template-columns: 1fr 1.25fr;
+    gap: var(--space-3xl);
+  }
+}
+
+.split-copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.split-copy p {
+  color: var(--color-ink-2);
+}
+
+/* — Code Inspection Cards (Cobalt Signature) — */
+.code-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.code-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) var(--space-md);
+  background-color: var(--color-surface-2);
+  border-bottom: 1px solid var(--color-rule);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+}
+
+.code-card pre {
+  padding: var(--space-md);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: 1.7;
+  color: var(--color-ink-2);
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.tok-key { color: var(--color-accent); }
+.tok-str { color: oklch(78% 0.12 160); }
+.tok-comment { color: var(--color-ink-muted); }
+
+/* — Comparison Section — */
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-xl);
+  margin-top: var(--space-2xl);
+}
+
+@media (min-width: 768px) {
+  .compare-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.compare-card {
+  padding: var(--space-xl);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-rule);
+  background-color: var(--color-surface);
+}
+
+.compare-card--engine {
+  border-color: var(--color-accent-dim);
+  background-color: oklch(16% 0.015 255);
+}
+
+.compare-card h3 {
+  margin-bottom: var(--space-md);
+}
+
+.compare-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+
+.compare-list li {
+  position: relative;
+  padding-left: var(--space-md);
+}
+
+.compare-list li::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  color: var(--color-ink-muted);
+}
+
+.compare-card--engine .compare-list li::before {
+  content: "✓";
+  color: var(--color-accent);
+}
+
+/* — Image Showcase Frame — */
+.media-frame {
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-md);
+  background-color: #000;
+  overflow: hidden;
+}
+
+.media-frame img {
+  width: 100%;
+  height: auto;
+}
+
+.media-frame video {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* — Exported layer gallery — */
+.layer-block {
+  margin-top: var(--space-3xl);
+}
+
+.layer-block h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-title);
+  color: var(--color-ink);
+  letter-spacing: -0.01em;
+}
+
+.layer-sub {
+  color: var(--color-ink-2);
+  margin-top: var(--space-sm);
+  max-width: 60ch;
+}
+
+.layer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-sm);
+  margin-top: var(--space-xl);
+}
+
+@media (min-width: 640px) {
+  .layer-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .layer-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+.layer-cell {
+  background: var(--color-surface);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  min-width: 0;
+  margin: 0;
+}
+
+.layer-cell__stage {
+  background: #000;
+  border-radius: var(--radius-sm);
+  min-height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.layer-cell img {
+  max-width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+.layer-cell__name {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-ink-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* — Architecture & Steps Cards (Workbench) — */
+.arch-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+  margin-top: var(--space-2xl);
+}
+
+@media (min-width: 840px) {
+  .arch-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.arch-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-md);
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.arch-card--primary {
+  border-color: var(--color-accent);
+  background: oklch(16.5% 0.018 255);
+}
+
+.arch-card__tag {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+}
+
+.arch-card--primary .arch-card__tag {
+  color: var(--color-accent);
+}
+
+/* — Spec Grid — */
+.spec-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+  margin-top: var(--space-2xl);
+}
+
+@media (min-width: 640px) {
+  .spec-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.spec-cell {
+  background: var(--color-surface);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+}
+
+.spec-cell__prop {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+
+.spec-cell__val {
+  color: var(--color-ink);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+/* — Ft5 Statement Footer — */
+.footer {
+  padding: var(--space-4xl) 0 var(--space-2xl);
+  background-color: var(--color-paper);
+}
+
+.footer__statement {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  font-weight: 600;
+  color: var(--color-ink);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  max-width: 32ch;
+  margin-bottom: var(--space-3xl);
+}
+
+.footer__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-rule);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+}
+
+.footer__nav {
+  display: flex;
+  gap: var(--space-lg);
+}
+
+.footer__nav a:hover {
+  color: var(--color-ink);
+}
+</style>
+</head>
+<body>
+
+<!-- N9 EDGE-ALIGNED MINIMAL NAVIGATION -->
+<header class="nav">
+  <div class="container nav__inner">
+    <a href="#hero" class="nav__brand">
+      <img src="assets/logo.svg" alt="" width="22" height="22">
+      <span>AgentMotion</span>
+    </a>
+    <div class="nav__actions">
+      <nav class="nav__links">
+        <a href="#pipeline">Problem</a>
+        <a href="#proof">Proof</a>
+        <a href="#how">How It Works</a>
+        <a href="#agents">Agents</a>
+        <a href="#architecture">Why Us</a>
+        <a href="#spec">Spec</a>
+      </nav>
+      <span class="badge-tag">pre-launch · local-first</span>
+    </div>
+  </div>
+</header>
+
+<main id="hero">
+
+  <!-- 1. HERO & WORKBENCH SHOWCASE -->
+  <section class="section hero">
+    <div class="container">
+      <h1>Deterministic motion graphics for Minecraft creators.</h1>
+      <p class="lede">A Python engine renders pixel-perfect layers. A Premiere Pro plugin assembles the timeline in one click.</p>
+
+      <!-- App Showcase Video Frame -->
+      <div class="workbench-frame">
+        <div class="workbench-bar">
+          <span class="workbench-bar__title">OUTPUT / CALC_SHINE 1080p.mp4</span>
+          <span>1920×1080 @60fps · lossless</span>
+        </div>
+        <div class="workbench-video-wrapper">
+          <video autoplay muted loop playsinline preload="metadata" src="assets/CALC_SHINE 1080p.mp4" aria-label="Engine render video of the calculator scene">
+          </video>
+        </div>
+        <div class="workbench-meta">
+          <span class="caption">Rendered in Premiere Pro from the plugin-assembled timeline, not a mockup.</span>
+          <span class="caption" style="color: var(--color-accent);">qtrle / PNG lossless pipeline</span>
+        </div>
+      </div>
+
+      <!-- Verified Grounding Metrics Strip -->
+      <div class="facts-strip">
+        <div class="fact-item">
+          <span class="fact-item__val">163</span>
+          <span class="fact-item__label">Golden tests, byte-identical</span>
+        </div>
+        <div class="fact-item">
+          <span class="fact-item__val">1920×1080</span>
+          <span class="fact-item__label">@60fps canvas with alpha</span>
+        </div>
+        <div class="fact-item">
+          <span class="fact-item__val">NEAREST</span>
+          <span class="fact-item__label">Integer scaling, 1:1 game 26.3</span>
+        </div>
+        <div class="fact-item">
+          <span class="fact-item__val">CEP Plugin</span>
+          <span class="fact-item__label">One-click Premiere assembly</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. PROBLEM VS SOLUTION -->
+  <section id="pipeline" class="section">
+    <div class="container">
+      <div class="split-layout">
+        <div class="split-copy">
+          <h2>Stop hand-placing pixels.<br>Compile scenes from data.</h2>
+          <p>Manual keyframing in NLEs results in single-use timelines, codec drift, and blurry pixel-art edges from non-integer scaling.</p>
+          <p>AgentMotion isolates the entire graphic generation into pure functions. Nondeterminism stops at the declarative scene definition; execution downstream produces byte-identical output.</p>
+        </div>
+        <div class="code-card">
+          <div class="code-card__header">
+            <span>scene.json — declarative input spec</span>
+            <span class="tok-comment">closed primitives</span>
+          </div>
+          <pre><code>{
+  <span class="tok-key">"screen"</span>: <span class="tok-str">"calculator"</span>,
+  <span class="tok-key">"timeline"</span>: [
+    { <span class="tok-key">"do"</span>: <span class="tok-str">"show"</span> },
+    { <span class="tok-key">"do"</span>: <span class="tok-str">"slide_in"</span> },
+    { <span class="tok-key">"do"</span>: <span class="tok-str">"cursor_move"</span> },
+    { <span class="tok-key">"do"</span>: <span class="tok-str">"hover"</span> },
+    { <span class="tok-key">"do"</span>: <span class="tok-str">"set_text"</span> },
+    { <span class="tok-key">"do"</span>: <span class="tok-str">"end"</span> }
+  ]
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="compare-grid">
+        <div class="compare-card">
+          <h3>Manual NLE Keyframing</h3>
+          <ul class="compare-list">
+            <li>Crafting, furnace, trading, and inventory GUIs nudged frame by frame.</li>
+            <li>Non-integer scaling blurs hard voxel pixel-art geometry.</li>
+            <li>Codec drift shifts color and pixel edges across re-exports.</li>
+            <li>Editing a layout or timing requires rebuilding the entire sequence.</li>
+          </ul>
+        </div>
+        <div class="compare-card compare-card--engine">
+          <h3>AgentMotion Pipeline</h3>
+          <ul class="compare-list">
+            <li>Python + Pillow engine renders tight PNG layers with alpha.</li>
+            <li>NEAREST-only integer scaling matching game version 26.3 colors 1:1.</li>
+            <li>Manifest.json specifies canvas, tracks, clips, positions, and keyframes.</li>
+            <li>163 golden tests guarantee byte-identical rendering.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. PROOF & HASH VERIFICATION -->
+  <section id="proof" class="section">
+    <div class="container">
+      <div class="split-layout">
+        <div class="split-copy">
+          <h2>The Premiere timeline matches the engine render.</h2>
+          <p>Every rendered layer carries file and pixel hashes inside manifest.json. During timeline assembly, the CEP/ExtendScript plugin verifies each hash and produces a per-clip report.json.</p>
+          <p>Lossless-only MOV (qtrle/PNG) is strictly enforced. ProRes was excluded after measuring 47px drift against our maximum 2px threshold. UXP plugin architecture was rejected following a silent hang with no error.</p>
+        </div>
+        <div>
+          <div class="media-frame">
+            <img src="assets/layers/V01_screen_1.png" alt="Base screen layer from the engine export" style="width: 100%; height: auto; image-rendering: pixelated;">
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-top: var(--space-sm);" class="caption">
+            <span>V01 screen layer · tight PNG with alpha</span>
+            <span>Full stack below</span>
+          </div>
+        </div>
+      </div>
+      <div class="layer-block">
+        <h3>Every layer, exactly as exported.</h3>
+        <p class="layer-sub">Each file below is a real PNG from the engine export. Track, target, and part are in the name. Nothing drawn for marketing.</p>
+        <div class="layer-grid">
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V01_screen_1.png" alt="V01_screen_1.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V01_screen_1.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V02_display_1.png" alt="V02_display_1.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V02_display_1.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V02_display_2.png" alt="V02_display_2.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V02_display_2.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V02_display_text_1.png" alt="V02_display_text_1.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V02_display_text_1.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V02_display_text_2.png" alt="V02_display_text_2.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V02_display_text_2.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V02_display_text_3.png" alt="V02_display_text_3.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V02_display_text_3.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V02_display_text_4.png" alt="V02_display_text_4.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V02_display_text_4.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V02_display_text_5.png" alt="V02_display_text_5.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V02_display_text_5.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V02_display_text_6.png" alt="V02_display_text_6.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V02_display_text_6.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V03_b7_1.png" alt="V03_b7_1.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V03_b7_1.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V04_b8_1.png" alt="V04_b8_1.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V04_b8_1.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V05_b9_1.png" alt="V05_b9_1.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V05_b9_1.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V06_b_div_1.png" alt="V06_b_div_1.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V06_b_div_1.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V07_b4_1.png" alt="V07_b4_1.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V07_b4_1.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V08_b5_1.png" alt="V08_b5_1.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V08_b5_1.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V09_b6_1.png" alt="V09_b6_1.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V09_b6_1.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V10_b_mul_1.png" alt="V10_b_mul_1.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V10_b_mul_1.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V10_b_mul_2.png" alt="V10_b_mul_2.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V10_b_mul_2.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V10_b_mul_3.png" alt="V10_b_mul_3.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V10_b_mul_3.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V11_b1_1.png" alt="V11_b1_1.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V11_b1_1.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V11_b1_2.png" alt="V11_b1_2.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V11_b1_2.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V11_b1_3.png" alt="V11_b1_3.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V11_b1_3.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V11_b1_4.png" alt="V11_b1_4.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V11_b1_4.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V11_b1_5.png" alt="V11_b1_5.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V11_b1_5.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V12_b2_1.png" alt="V12_b2_1.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V12_b2_1.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V12_b2_2.png" alt="V12_b2_2.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V12_b2_2.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V12_b2_3.png" alt="V12_b2_3.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V12_b2_3.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V13_b3_1.png" alt="V13_b3_1.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V13_b3_1.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V14_b_sub_1.png" alt="V14_b_sub_1.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V14_b_sub_1.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V15_b_clear_1.png" alt="V15_b_clear_1.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V15_b_clear_1.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V16_b0_1.png" alt="V16_b0_1.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V16_b0_1.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V16_b0_2.png" alt="V16_b0_2.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V16_b0_2.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V16_b0_3.png" alt="V16_b0_3.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V16_b0_3.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V17_b_eq_1.png" alt="V17_b_eq_1.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V17_b_eq_1.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V17_b_eq_2.png" alt="V17_b_eq_2.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V17_b_eq_2.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V17_b_eq_3.png" alt="V17_b_eq_3.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V17_b_eq_3.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V18_b_add_1.png" alt="V18_b_add_1.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V18_b_add_1.png</figcaption>
+          </figure>
+          <figure class="layer-cell">
+            <div class="layer-cell__stage"><img src="assets/layers/V19_cursor_1.png" alt="V19_cursor_1.png" loading="lazy"></div>
+            <figcaption class="layer-cell__name">V19_cursor_1.png</figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. HOW IT WORKS (STEPS 1 / 2 / 3) -->
+  <section id="how" class="section">
+    <div class="container">
+      <h2>Declarative scene in.<br>Editable timeline out.</h2>
+      <div class="arch-grid">
+        <div class="arch-card">
+          <span class="arch-card__tag">STEP 1 · SCENE.JSON</span>
+          <h3>Declarative Layout & Actions</h3>
+          <p>Define screen layout and a timeline of actions (show, hide, pop, slide_in, set_text, hover, cursor_move, end) by hand or via an LLM agent.</p>
+        </div>
+        <div class="arch-card">
+          <span class="arch-card__tag">STEP 2 · ENGINE RENDER</span>
+          <h3>PNG Layers + Manifest</h3>
+          <p>Python + Pillow renders tight PNG layers with alpha, writes manifest.json (canvas, fps, tracks, clips, positions, scales, keyframes, hashes), and generates README_premiere.txt.</p>
+        </div>
+        <div class="arch-card arch-card--primary">
+          <span class="arch-card__tag">STEP 3 · CEP PLUGIN</span>
+          <h3>One-Click Timeline Assembly</h3>
+          <p>The Premiere Pro CEP/ExtendScript plugin reads manifest.json, inserts clips on tracks, writes Position and Scale keyframes, verifies hashes, and writes report.json per clip.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. AGENTIC LAYER -->
+  <section id="agents" class="section">
+    <div class="container">
+      <div class="split-layout">
+        <div class="split-copy">
+          <h2>Any LLM can author scenes.<br>Deterministic execution below.</h2>
+          <p>Authoring agents operate with a dedicated skill guide, generated JSON Schema, and a self-correcting validator. Models never emit fragile video keyframes directly — they write structured intent.</p>
+          <p>Every validation error returns exact path locations and deterministic fixes. Conscious soft-rule breaks record through explicit allow and reason fields into the manifest.</p>
+        </div>
+        <div class="code-card">
+          <div class="code-card__header">
+            <span>validator.py — self-correcting schema output</span>
+            <span class="tok-comment">machine actionable</span>
+          </div>
+          <pre><code>{
+   <span class="tok-key">"level"</span>: <span class="tok-str">"error"</span>,
+  <span class="tok-key">"path"</span>: <span class="tok-str">"/timeline/action"</span>,
+  <span class="tok-key">"fix"</span>: {
+    <span class="tok-key">"op"</span>: <span class="tok-str">"replace"</span>,
+    <span class="tok-key">"path"</span>: <span class="tok-str">"/timeline/action/do"</span>,
+    <span class="tok-key">"value"</span>: <span class="tok-str">"slide_in"</span>
+  }
+}</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. WHY US (ARCHITECTURE MATRIX) -->
+  <section id="architecture" class="section">
+    <div class="container">
+      <h2>Different architectures.<br>Different degrees of control.</h2>
+      <div class="arch-grid">
+        <div class="arch-card">
+          <span class="arch-card__tag">PRESET LIBRARIES</span>
+          <h3>Flat Video Clips</h3>
+          <p>Fixed catalog of finished clips. Imported into your editor as flat video with no access to per-layer tracks, coordinates, or timing adjustment.</p>
+        </div>
+        <div class="arch-card">
+          <span class="arch-card__tag">GENERALIST AGENT VIDEO</span>
+          <h3>Cloud Generator</h3>
+          <p>Generation lives on vendor infrastructure and delivers a flat shared file. Inability to adjust GUI tracks or re-time keyframes inside Premiere Pro.</p>
+        </div>
+        <div class="arch-card arch-card--primary">
+          <span class="arch-card__tag">AGENTMOTION</span>
+          <h3>Native NLE Timeline</h3>
+          <p>Declarative JSON rendered to voxel pixel-art layers with NEAREST scaling. The CEP plugin builds native tracks, clips, and keyframes directly on your timeline.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. TECHNICAL SPEC SHEET -->
+  <section id="spec" class="section">
+    <div class="container">
+      <h2>Engineering specifications.</h2>
+      <div class="spec-grid">
+        <div class="spec-cell">
+          <div class="spec-cell__prop">Engine</div>
+          <div class="spec-cell__val">Python + Pillow. Compiles scene.json to tight PNG layers with alpha, manifest.json, and README_premiere.txt assembly recipes.</div>
+        </div>
+        <div class="spec-cell">
+          <div class="spec-cell__prop">Canvas & Raster</div>
+          <div class="spec-cell__val">1920×1080 @60fps with alpha layers. NEAREST-only integer scaling preserving pixel-art raster integrity.</div>
+        </div>
+        <div class="spec-cell">
+          <div class="spec-cell__prop">Color & Verification</div>
+          <div class="spec-cell__val">Colors match 1:1 from game version 26.3. Tested against 163 golden tests for byte-identical reproducibility.</div>
+        </div>
+        <div class="spec-cell">
+          <div class="spec-cell__prop">Premiere Pro Integration</div>
+          <div class="spec-cell__val">CEP/ExtendScript plugin. Lossless-only MOV (qtrle/PNG). ProRes excluded after measuring 47px drift (max 2px allowed). UXP rejected after silent hang.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- 8. FT5 STATEMENT FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <p class="footer__statement">Motion graphics as code. Deterministic, local-first, byte-identical.</p>
+    <div class="footer__meta">
+      <span>© AgentMotion, solo-founder</span>
+      <nav class="footer__nav">
+        <a href="#pipeline">Problem</a>
+        <a href="#proof">Proof</a>
+        <a href="#how">How It Works</a>
+        <a href="#agents">Agents</a>
+        <a href="#architecture">Why Us</a>
+        <a href="#spec">Spec</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

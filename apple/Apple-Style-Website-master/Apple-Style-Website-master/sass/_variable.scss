@@ -1,0 +1,15 @@
+$menu-bg-color:#FBFBFD;
+$menu-font:sans-serif;
+
+@mixin menu-style(){
+    position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 999;
+        padding: 10px 100px;
+}
+
+@mixin bg-image ($var){
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), url(../images/#{$var}.jpg);
+}

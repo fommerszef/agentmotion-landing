@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentMotion — Deterministic motion graphics for Minecraft creators (v5 Pro Engine)</title>
+<meta name="description" content="A Python engine renders pixel-perfect Minecraft-style GUI layers. A Premiere Pro plugin assembles the timeline in one click. Pre-launch, local-first.">
+<link rel="icon" href="assets/brand-logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Silkscreen&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* Hallmark + Precision Engineering (v5): Big Centerpiece Video, Clean Matte Borders, Readable Typography */
+
+:root {
+  /* Slate & Charcoal Palette */
+  --color-paper: #0b0d13;
+  --color-surface: #12151f;
+  --color-surface-2: #171b27;
+  --color-surface-elevated: #1e2333;
+
+  /* Typography Colors */
+  --color-ink: #f4f5f8;
+  --color-ink-2: #a5abbd;
+  --color-ink-muted: #656d82;
+
+  /* Hairlines & Borders — Matte, Razor-Sharp (Zero fake bevels) */
+  --color-rule: #222738;
+  --color-rule-subtle: #171b26;
+
+  /* Signal Accents */
+  --color-accent: #26a8ff;
+  --color-accent-dim: #134568;
+  --color-accent-ink: #071723;
+  --color-success: #34d399;
+
+  /* Font Stacks */
+  --font-display: "Space Grotesk", -apple-system, sans-serif;
+  --font-body: "Inter", -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-pixel: "Silkscreen", monospace;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 72px;
+  --space-4xl: 104px;
+  --space-5xl: 140px;
+
+  --radius: 3px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  overflow-x: clip;
+  background-color: var(--color-paper);
+  color: var(--color-ink-2);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+}
+
+img, video {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  image-rendering: pixelated;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+/* — Container — */
+.container {
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 var(--space-lg);
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 0 var(--space-2xl);
+  }
+}
+
+/* — Navigation — */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: rgba(11, 13, 19, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-rule);
+  padding: 14px 0;
+}
+
+.nav__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+}
+
+.nav__brand img {
+  width: 30px;
+  height: 30px;
+}
+
+.nav__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xl);
+}
+
+.nav__links {
+  display: none;
+  gap: var(--space-lg);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--color-ink-muted);
+}
+
+@media (min-width: 860px) {
+  .nav__links {
+    display: flex;
+  }
+}
+
+.nav__links a:hover {
+  color: var(--color-ink);
+}
+
+.badge-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-ink-2);
+  background: var(--color-surface);
+  border: 1px solid var(--color-rule);
+  padding: 5px 12px;
+  border-radius: var(--radius);
+}
+
+.badge-tag::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: var(--color-accent);
+}
+
+/* — Version Switcher Floating Pill — */
+.version-switcher {
+  position: fixed;
+  bottom: var(--space-lg);
+  right: var(--space-lg);
+  z-index: 100;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: var(--color-surface);
+  border: 1px solid var(--color-accent);
+  padding: 8px 14px;
+  border-radius: 999px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-ink);
+}
+
+.version-switcher a {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+/* — Typography — */
+h1, h2, h3 {
+  font-family: var(--font-display);
+  color: var(--color-ink);
+  letter-spacing: -0.03em;
+  font-style: normal;
+}
+
+h1 {
+  font-size: clamp(2.5rem, 5.2vw, 4rem);
+  line-height: 1.06;
+  font-weight: 700;
+}
+
+h2 {
+  font-size: clamp(1.85rem, 3.8vw, 2.75rem);
+  line-height: 1.15;
+  font-weight: 700;
+}
+
+h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.lede {
+  font-size: clamp(1.1rem, 2vw, 1.25rem);
+  color: var(--color-ink-2);
+  line-height: 1.55;
+  margin-top: var(--space-md);
+}
+
+.caption {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--color-ink-muted);
+  line-height: 1.5;
+}
+
+/* — Section Rhythm — */
+.section {
+  padding: var(--space-4xl) 0;
+  border-bottom: 1px solid var(--color-rule-subtle);
+}
+
+@media (min-width: 1024px) {
+  .section {
+    padding: var(--space-5xl) 0;
+  }
+}
+
+/* ==========================================================================
+   HERO: LARGE MONUMENTAL WORKBENCH SHOWCASE (CLEAN, HUGE, POWERFUL)
+   ========================================================================== */
+.hero {
+  padding-top: var(--space-3xl);
+  padding-bottom: var(--space-4xl);
+}
+
+.hero-header {
+  text-align: center;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.hero-header h1 {
+  max-width: 22ch;
+  margin: 0 auto;
+}
+
+.hero-header .lede {
+  max-width: 58ch;
+  margin: var(--space-md) auto 0;
+}
+
+/* Big Video Workbench Frame */
+.workbench-frame-large {
+  width: 100%;
+  max-width: 1060px;
+  margin: var(--space-2xl) auto 0;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 24px 64px -12px rgba(0, 0, 0, 0.8);
+}
+
+.workbench-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background-color: var(--color-surface-2);
+  border-bottom: 1px solid var(--color-rule);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-ink-muted);
+}
+
+.workbench-bar__title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-ink);
+  font-weight: 500;
+}
+
+.workbench-bar__title::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  background-color: var(--color-accent);
+}
+
+.workbench-video-wrapper-large {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-color: #000;
+}
+
+.workbench-video-wrapper-large video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.workbench-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: 12px 18px;
+  border-top: 1px solid var(--color-rule);
+  background-color: var(--color-surface);
+}
+
+/* Facts Strip — Clean Matte Grid */
+.facts-strip-hero {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-md);
+  max-width: 1060px;
+  margin: var(--space-xl) auto 0;
+}
+
+@media (min-width: 768px) {
+  .facts-strip-hero {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.fact-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.fact-card__val {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  letter-spacing: -0.02em;
+}
+
+.fact-card__label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-ink-muted);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* — Split Narrative Sections — */
+.split-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2xl);
+  align-items: start;
+}
+
+@media (min-width: 960px) {
+  .split-layout {
+    grid-template-columns: 1fr 1.25fr;
+    gap: var(--space-3xl);
+  }
+}
+
+.split-copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.split-copy p {
+  color: var(--color-ink-2);
+}
+
+/* — Code Inspection Cards — */
+.code-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.code-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background-color: var(--color-surface-2);
+  border-bottom: 1px solid var(--color-rule);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-ink-muted);
+}
+
+.code-card pre {
+  padding: var(--space-md);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  color: var(--color-ink-2);
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.tok-key { color: var(--color-accent); }
+.tok-str { color: #34d399; }
+.tok-num { color: #f59e0b; }
+.tok-comment { color: var(--color-ink-muted); }
+
+/* — Comparison Section — */
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-xl);
+  margin-top: var(--space-2xl);
+}
+
+@media (min-width: 768px) {
+  .compare-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.compare-card {
+  padding: var(--space-xl);
+  border-radius: var(--radius);
+  border: 1px solid var(--color-rule);
+  background-color: var(--color-surface);
+}
+
+.compare-card--engine {
+  border-color: var(--color-accent-dim);
+  background-color: #121929;
+}
+
+.compare-card h3 {
+  margin-bottom: var(--space-md);
+}
+
+.compare-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  font-size: 0.9375rem;
+  color: var(--color-ink-2);
+}
+
+.compare-list li {
+  position: relative;
+  padding-left: var(--space-md);
+}
+
+.compare-list li::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  color: var(--color-ink-muted);
+}
+
+.compare-card--engine .compare-list li::before {
+  content: "✓";
+  color: var(--color-accent);
+}
+
+/* — Image Showcase Frame — */
+.media-frame {
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius);
+  background-color: #000;
+  overflow: hidden;
+}
+
+.media-frame img {
+  width: 100%;
+  height: auto;
+}
+
+/* — Architecture & Steps Cards — */
+.arch-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-lg);
+  margin-top: var(--space-2xl);
+}
+
+@media (min-width: 840px) {
+  .arch-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.arch-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius);
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.arch-card--primary {
+  border-color: var(--color-accent);
+  background: #121a2d;
+}
+
+.arch-card__tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-ink-muted);
+  letter-spacing: 0.04em;
+}
+
+.arch-card--primary .arch-card__tag {
+  color: var(--color-accent);
+}
+
+/* — Spec Grid — */
+.spec-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+  margin-top: var(--space-2xl);
+}
+
+@media (min-width: 640px) {
+  .spec-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.spec-cell {
+  background: var(--color-surface);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius);
+  padding: var(--space-lg);
+}
+
+.spec-cell__prop {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.spec-cell__val {
+  color: var(--color-ink);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+/* — Footer — */
+.footer {
+  padding: var(--space-4xl) 0 var(--space-2xl);
+  background-color: var(--color-paper);
+}
+
+.footer__statement {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  font-weight: 700;
+  color: var(--color-ink);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  max-width: 32ch;
+  margin-bottom: var(--space-3xl);
+}
+
+.footer__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-rule);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-ink-muted);
+}
+
+.footer__nav {
+  display: flex;
+  gap: var(--space-lg);
+}
+
+.footer__nav a:hover {
+  color: var(--color-accent);
+}
+</style>
+</head>
+<body>
+
+<!-- FLOATING VERSION COMPARISON PILL -->
+<div class="version-switcher">
+  <span>Preview: <strong>v5 Pro Engine</strong></span>
+  <span>|</span>
+  <a href="index.html">v1</a>
+  <span>|</span>
+  <a href="index_v2.html">v2</a>
+  <span>|</span>
+  <a href="index_v3.html">v3</a>
+  <span>|</span>
+  <a href="index_v4.html">v4</a>
+</div>
+
+<!-- NAVIGATION WITH PROMINENT LOGO -->
+<header class="nav">
+  <div class="container nav__inner">
+    <a href="#hero" class="nav__brand">
+      <img src="assets/brand-logo.svg" alt="AgentMotion Logo" width="30" height="30">
+      <span>AgentMotion</span>
+    </a>
+    <div class="nav__actions">
+      <nav class="nav__links">
+        <a href="#pipeline">Problem</a>
+        <a href="#proof">Proof</a>
+        <a href="#how">How It Works</a>
+        <a href="#agents">Agents</a>
+        <a href="#architecture">Why Us</a>
+        <a href="#spec">Spec</a>
+      </nav>
+      <span class="badge-tag">pre-launch · local-first</span>
+    </div>
+  </div>
+</header>
+
+<main id="hero">
+
+  <!-- 1. HERO & WORKBENCH SHOWCASE (BIG VIDEO CENTERPIECE) -->
+  <section class="section hero">
+    <div class="container">
+      <div class="hero-header">
+        <h1>Deterministic motion graphics for Minecraft creators.</h1>
+        <p class="lede">A Python engine renders pixel-perfect layers. A Premiere Pro plugin assembles the timeline in one click.</p>
+      </div>
+
+      <!-- HUGE PROMINENT WORKBENCH FRAME -->
+      <div class="workbench-frame-large">
+        <div class="workbench-bar">
+          <span class="workbench-bar__title">OUTPUT / CALC_10X12 / composite.mov</span>
+          <span>1920×1080 @60fps · lossless</span>
+        </div>
+        <div class="workbench-video-wrapper-large">
+          <video autoplay muted loop playsinline poster="assets/hero-poster.png">
+            <source src="assets/hero.mp4" type="video/mp4">
+            <source src="assets/CALC_SHINE 1080p.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="workbench-meta">
+          <span class="caption">Engine render, not a mockup. Calculator scene, 1920×1080 @60fps with verified alpha layers.</span>
+          <span class="caption" style="color: var(--color-accent); font-weight: 500;">qtrle / PNG lossless</span>
+        </div>
+      </div>
+
+      <!-- 4 CLEAN GROUNDING FACTS (CLEAN MATTE PANELS) -->
+      <div class="facts-strip-hero">
+        <div class="fact-card">
+          <span class="fact-card__val">163</span>
+          <span class="fact-card__label">Golden tests, byte-identical</span>
+        </div>
+        <div class="fact-card">
+          <span class="fact-card__val">1920×1080</span>
+          <span class="fact-card__label">@60fps canvas with alpha</span>
+        </div>
+        <div class="fact-card">
+          <span class="fact-card__val" style="font-family: var(--font-pixel); font-size: 1.25rem;">NEAREST</span>
+          <span class="fact-card__label">Integer scaling, 1:1 game 26.3</span>
+        </div>
+        <div class="fact-card">
+          <span class="fact-card__val">CEP Plugin</span>
+          <span class="fact-card__label">One-click Premiere assembly</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 2. PROBLEM VS SOLUTION -->
+  <section id="pipeline" class="section">
+    <div class="container">
+      <div class="split-layout">
+        <div class="split-copy">
+          <h2>Stop hand-placing pixels.<br>Compile scenes from data.</h2>
+          <p>Manual keyframing in NLEs results in single-use timelines, codec drift, and blurry pixel-art edges from non-integer scaling.</p>
+          <p>AgentMotion isolates the entire graphic generation into pure functions. Nondeterminism stops at the declarative scene definition; execution downstream produces byte-identical output.</p>
+        </div>
+        <div class="code-card">
+          <div class="code-card__header">
+            <span>scene.json — declarative input spec</span>
+            <span class="tok-comment">closed primitives</span>
+          </div>
+          <pre><code>{
+  <span class="tok-key">"screen"</span>: <span class="tok-str">"calculator"</span>,
+  <span class="tok-key">"timeline"</span>: [
+    { <span class="tok-key">"do"</span>: <span class="tok-str">"show"</span> },
+    { <span class="tok-key">"do"</span>: <span class="tok-str">"slide_in"</span> },
+    { <span class="tok-key">"do"</span>: <span class="tok-str">"cursor_move"</span> },
+    { <span class="tok-key">"do"</span>: <span class="tok-str">"hover"</span> },
+    { <span class="tok-key">"do"</span>: <span class="tok-str">"set_text"</span> },
+    { <span class="tok-key">"do"</span>: <span class="tok-str">"end"</span> }
+  ]
+}</code></pre>
+        </div>
+      </div>
+
+      <div class="compare-grid">
+        <div class="compare-card">
+          <h3>Manual NLE Keyframing</h3>
+          <ul class="compare-list">
+            <li>Crafting, furnace, trading, and inventory GUIs nudged frame by frame.</li>
+            <li>Non-integer scaling blurs hard voxel pixel-art geometry.</li>
+            <li>Codec drift shifts color and pixel edges across re-exports.</li>
+            <li>Editing a layout or timing requires rebuilding the entire sequence.</li>
+          </ul>
+        </div>
+        <div class="compare-card compare-card--engine">
+          <h3>AgentMotion Pipeline</h3>
+          <ul class="compare-list">
+            <li>Python + Pillow engine renders tight PNG layers with alpha.</li>
+            <li>NEAREST-only integer scaling matching game version 26.3 colors 1:1.</li>
+            <li>Manifest.json specifies canvas, tracks, clips, positions, and keyframes.</li>
+            <li>163 golden tests guarantee byte-identical rendering.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. PROOF & HASH VERIFICATION -->
+  <section id="proof" class="section">
+    <div class="container">
+      <div class="split-layout">
+        <div class="split-copy">
+          <h2>The Premiere timeline matches the engine render.</h2>
+          <p>Every rendered layer carries file and pixel hashes inside manifest.json. During timeline assembly, the CEP/ExtendScript plugin verifies each hash and produces a per-clip report.json.</p>
+          <p>Lossless-only MOV (qtrle/PNG) is strictly enforced. ProRes was excluded after measuring 47px drift against our maximum 2px threshold. UXP plugin architecture was rejected following a silent hang with no error.</p>
+        </div>
+        <div>
+          <div class="media-frame">
+            <img src="assets/composite.png" alt="Engine render composite for calculator screen" width="1920" height="1080">
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-top: var(--space-sm);" class="caption">
+            <span>Composite render layer · CALC_10X12</span>
+            <span>Alpha channel preserved</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. HOW IT WORKS (STEPS 1 / 2 / 3) -->
+  <section id="how" class="section">
+    <div class="container">
+      <h2>Declarative scene in.<br>Editable timeline out.</h2>
+      <div class="arch-grid">
+        <div class="arch-card">
+          <span class="arch-card__tag">STEP 1 · SCENE.JSON</span>
+          <h3>Declarative Layout & Actions</h3>
+          <p>Define screen layout and a timeline of actions (show, hide, pop, slide_in, set_text, hover, cursor_move, end) by hand or via an LLM agent.</p>
+        </div>
+        <div class="arch-card">
+          <span class="arch-card__tag">STEP 2 · ENGINE RENDER</span>
+          <h3>PNG Layers + Manifest</h3>
+          <p>Python + Pillow renders tight PNG layers with alpha, writes manifest.json (canvas, fps, tracks, clips, positions, scales, keyframes, hashes), and generates README_premiere.txt.</p>
+        </div>
+        <div class="arch-card arch-card--primary">
+          <span class="arch-card__tag">STEP 3 · CEP PLUGIN</span>
+          <h3>One-Click Timeline Assembly</h3>
+          <p>The Premiere Pro CEP/ExtendScript plugin reads manifest.json, inserts clips on tracks, writes Position and Scale keyframes, verifies hashes, and writes report.json per clip.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. AGENTIC LAYER -->
+  <section id="agents" class="section">
+    <div class="container">
+      <div class="split-layout">
+        <div class="split-copy">
+          <h2>Any LLM can author scenes.<br>Deterministic execution below.</h2>
+          <p>Authoring agents operate with a dedicated skill guide, generated JSON Schema, and a self-correcting validator. Models never emit fragile video keyframes directly — they write structured intent.</p>
+          <p>Every validation error returns exact path locations and deterministic fixes. Conscious soft-rule breaks record through explicit allow and reason fields into the manifest.</p>
+        </div>
+        <div class="code-card">
+          <div class="code-card__header">
+            <span>validator.py — self-correcting schema output</span>
+            <span class="tok-comment">machine actionable</span>
+          </div>
+          <pre><code>{
+  <span class="tok-key">"status"</span>: <span class="tok-str">"error"</span>,
+  <span class="tok-key">"location"</span>: <span class="tok-str">"/timeline/action"</span>,
+  <span class="tok-key">"fix"</span>: {
+    <span class="tok-key">"op"</span>: <span class="tok-str">"replace"</span>,
+    <span class="tok-key">"location"</span>: <span class="tok-str">"/timeline/action/do"</span>,
+    <span class="tok-key">"value"</span>: <span class="tok-str">"slide_in"</span>
+  }
+}</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. WHY US (ARCHITECTURE MATRIX) -->
+  <section id="architecture" class="section">
+    <div class="container">
+      <h2>Different architectures.<br>Different degrees of control.</h2>
+      <div class="arch-grid">
+        <div class="arch-card">
+          <span class="arch-card__tag">PRESET LIBRARIES</span>
+          <h3>Flat Video Clips</h3>
+          <p>Fixed catalog of finished clips. Imported into your editor as flat video with no access to per-layer tracks, coordinates, or timing adjustment.</p>
+        </div>
+        <div class="arch-card">
+          <span class="arch-card__tag">GENERALIST AGENT VIDEO</span>
+          <h3>Cloud Generator</h3>
+          <p>Generation lives on vendor infrastructure and delivers a flat shared file. Inability to adjust GUI tracks or re-time keyframes inside Premiere Pro.</p>
+        </div>
+        <div class="arch-card arch-card--primary">
+          <span class="arch-card__tag">AGENTMOTION</span>
+          <h3>Native NLE Timeline</h3>
+          <p>Declarative JSON rendered to voxel pixel-art layers with NEAREST scaling. The CEP plugin builds native tracks, clips, and keyframes directly on your timeline.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. TECHNICAL SPEC SHEET -->
+  <section id="spec" class="section">
+    <div class="container">
+      <h2>Engineering specifications.</h2>
+      <div class="spec-grid">
+        <div class="spec-cell">
+          <div class="spec-cell__prop">Engine</div>
+          <div class="spec-cell__val">Python + Pillow. Compiles scene.json to tight PNG layers with alpha, manifest.json, and README_premiere.txt assembly recipes.</div>
+        </div>
+        <div class="spec-cell">
+          <div class="spec-cell__prop">Canvas & Raster</div>
+          <div class="spec-cell__val">1920×1080 @60fps with alpha layers. NEAREST-only integer scaling preserving pixel-art raster integrity.</div>
+        </div>
+        <div class="spec-cell">
+          <div class="spec-cell__prop">Color & Verification</div>
+          <div class="spec-cell__val">Colors match 1:1 from game version 26.3. Tested against 163 golden tests for byte-identical reproducibility.</div>
+        </div>
+        <div class="spec-cell">
+          <div class="spec-cell__prop">Premiere Pro Integration</div>
+          <div class="spec-cell__val">CEP/ExtendScript plugin. Lossless-only MOV (qtrle/PNG). ProRes excluded after measuring 47px drift (max 2px allowed). UXP rejected after silent hang.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- 8. FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <p class="footer__statement">Motion graphics as code. Deterministic, local-first, byte-identical.</p>
+    <div class="footer__meta">
+      <span>© AgentMotion, solo-founder</span>
+      <nav class="footer__nav">
+        <a href="#pipeline">Problem</a>
+        <a href="#proof">Proof</a>
+        <a href="#how">How It Works</a>
+        <a href="#agents">Agents</a>
+        <a href="#architecture">Why Us</a>
+        <a href="#spec">Spec</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

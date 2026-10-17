@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgentMotion — Deterministic motion graphics for Minecraft creators</title>
+<meta name="description" content="AgentMotion is a deterministic Python engine that renders Minecraft-style GUI layers with alpha plus manifest, assembled in Premiere Pro by a CEP plugin. Local-first, pre-launch solo-founder project.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' shape-rendering='crispEdges'%3E%3Crect width='16' height='16' fill='%23000'/%3E%3Crect x='2' y='6' width='12' height='8' fill='%238B5A2B'/%3E%3Crect x='2' y='6' width='12' height='3' fill='%235EBB2B'/%3E%3Crect x='2' y='6' width='3' height='8' fill='%23C6C6C6'/%3E%3Crect x='4' y='8' width='2' height='2' fill='%23000'/%3E%3Crect x='10' y='8' width='2' height='2' fill='%23000'/%3E%3C/svg%3E">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['Inter','system-ui','sans-serif'],
+        mono: ['"Fira Code"','ui-monospace','SFMono-Regular','Menlo','monospace'],
+      }
+    }
+  }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  html{background:#09090b;}
+  body{-webkit-font-smoothing:antialiased;}
+  pre{white-space:pre;overflow-x:auto;}
+  ::selection{background:#5EBB2B;color:#09090b;}
+  img{image-rendering:pixelated;}
+</style>
+</head>
+<body class="bg-neutral-950 text-neutral-200 font-sans">
+
+<!-- TOP BAR -->
+<header class="border-b border-neutral-800">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-14">
+    <div class="flex items-center gap-3">
+      <svg width="20" height="20" viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true"><rect width="16" height="16" fill="#09090b"/><rect x="2" y="6" width="12" height="8" fill="#8B5A2B"/><rect x="2" y="6" width="12" height="3" fill="#5EBB2B"/><rect x="2" y="6" width="3" height="8" fill="#C6C6C6"/><rect x="4" y="8" width="2" height="2" fill="#000"/><rect x="10" y="8" width="2" height="2" fill="#000"/></svg>
+      <span class="font-mono text-sm font-semibold tracking-tight text-neutral-100">AgentMotion</span>
+      <span class="hidden sm:inline font-mono text-[11px] text-neutral-500 border border-neutral-800 px-2 py-0.5">pre-launch · local-first</span>
+    </div>
+    <nav class="hidden md:flex items-center gap-6 font-mono text-xs text-neutral-400">
+      <a href="#problem" class="hover:text-neutral-100">problem</a>
+      <a href="#proof" class="hover:text-neutral-100">proof</a>
+      <a href="#how" class="hover:text-neutral-100">how</a>
+      <a href="#agents" class="hover:text-neutral-100">agents</a>
+      <a href="#why" class="hover:text-neutral-100">why</a>
+    </nav>
+    <div class="flex items-center gap-2">
+      <a href="#how" class="font-mono text-xs bg-neutral-100 text-neutral-950 px-3 py-1.5 font-semibold hover:bg-white">see pipeline</a>
+      <button id="menuBtn" class="md:hidden font-mono text-xs border border-neutral-800 px-3 py-1.5 text-neutral-300" aria-label="Toggle menu">[=]</button>
+    </div>
+  </div>
+  <div id="mobileMenu" class="hidden md:hidden border-t border-neutral-800 px-4 py-3 font-mono text-sm text-neutral-300 flex flex-col gap-3">
+    <a href="#problem" class="hover:text-white">problem</a>
+    <a href="#proof" class="hover:text-white">proof</a>
+    <a href="#how" class="hover:text-white">how</a>
+    <a href="#agents" class="hover:text-white">agents</a>
+    <a href="#why" class="hover:text-white">why</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="border-b border-neutral-800 relative overflow-hidden">
+  <div class="pointer-events-none select-none absolute inset-0 overflow-hidden" aria-hidden="true">
+    <p class="font-mono text-sm leading-8 text-neutral-800/70 whitespace-nowrap">tracks clips keyframes positions scales layers alpha manifest scene validator schema report tracks clips keyframes positions scales layers alpha manifest scene validator schema report</p>
+    <p class="font-mono text-sm leading-8 text-neutral-800/50 whitespace-nowrap">validator schema report tracks clips keyframes positions scales layers alpha manifest scene validator schema report tracks clips keyframes positions scales layers alpha manifest scene</p>
+    <p class="font-mono text-sm leading-8 text-neutral-800/70 whitespace-nowrap">layers alpha manifest scene validator schema report tracks clips keyframes positions scales layers alpha manifest scene validator schema report tracks clips keyframes positions scales</p>
+  </div>
+  <div class="relative max-w-6xl mx-auto px-4 sm:px-6 pt-12 pb-10 md:pt-20 md:pb-14 grid grid-cols-1 lg:grid-cols-12 gap-10">
+    <div class="lg:col-span-7">
+      <p class="font-mono text-xs text-neutral-500 mb-4"><span class="text-[#5EBB2B]">■</span> python engine · premiere pro plugin · agentic scenes</p>
+      <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-neutral-50 leading-[1.02]">Deterministic motion graphics for Minecraft creators.</h1>
+      <p class="mt-6 text-lg text-neutral-400 leading-relaxed max-w-xl">A Python engine renders pixel-perfect layers. A Premiere Pro plugin assembles the timeline in one click.</p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href="#how" class="font-mono text-sm bg-neutral-100 text-neutral-950 px-4 py-2.5 font-semibold hover:bg-white">how it works ↓</a>
+        <a href="#proof" class="font-mono text-sm border border-neutral-700 text-neutral-200 px-4 py-2.5 hover:border-neutral-500 hover:text-white">engine vs premiere</a>
+      </div>
+      <dl class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-px bg-neutral-800 border border-neutral-800">
+        <div class="bg-neutral-950 p-4">
+          <dt class="font-mono text-[11px] uppercase tracking-wider text-neutral-500">golden tests</dt>
+          <dd class="font-mono text-xl text-neutral-100 mt-1">163 <span class="text-xs text-neutral-500">byte-identical</span></dd>
+        </div>
+        <div class="bg-neutral-950 p-4">
+          <dt class="font-mono text-[11px] uppercase tracking-wider text-neutral-500">canvas</dt>
+          <dd class="font-mono text-xl text-neutral-100 mt-1">1920×1080 <span class="text-xs text-neutral-500">@60fps · alpha layers</span></dd>
+        </div>
+        <div class="bg-neutral-950 p-4">
+          <dt class="font-mono text-[11px] uppercase tracking-wider text-neutral-500">scaling</dt>
+          <dd class="font-mono text-xl text-neutral-100 mt-1">NEAREST-only <span class="text-xs text-neutral-500">integer · colors 1:1 game 26.3</span></dd>
+        </div>
+        <div class="bg-neutral-950 p-4">
+          <dt class="font-mono text-[11px] uppercase tracking-wider text-neutral-500">delivery</dt>
+          <dd class="font-mono text-xl text-neutral-100 mt-1">CEP plugin <span class="text-xs text-neutral-500">lossless-only MOV qtrle / PNG</span></dd>
+        </div>
+      </dl>
+      <p class="mt-4 font-mono text-xs text-neutral-500">ProRes excluded after measuring 47px drift (max 2). UXP spike rejected after a silent hang with no error.</p>
+    </div>
+    <div class="lg:col-span-5">
+      <figure class="border border-neutral-800 bg-neutral-900/40">
+        <div class="flex items-center justify-between px-3 py-2 border-b border-neutral-800 font-mono text-[11px] text-neutral-500">
+          <span>reference render — calculator scene</span>
+          <span class="text-neutral-600">PNG + alpha</span>
+        </div>
+        <img src="assets/composite.png" alt="Calculator composite render with pixel-perfect Minecraft-style GUI" class="w-full block bg-black">
+        <figcaption class="px-3 py-2 border-t border-neutral-800 font-mono text-[11px] text-neutral-500">Rendered from declarative scene.json. Assembled in Premiere Pro with verified file and pixel hashes.</figcaption>
+      </figure>
+      <div class="mt-4 border border-neutral-800 bg-neutral-950 p-4 font-mono text-xs leading-relaxed text-neutral-400">
+        <p><span class="text-neutral-600">$</span> validate scene.json <span class="text-[#5EBB2B]">→ schema + rules ok</span></p>
+        <p><span class="text-neutral-600">$</span> render layers + manifest <span class="text-[#5EBB2B]">→ byte-identical</span></p>
+        <p><span class="text-neutral-600">$</span> cep assemble <span class="text-[#5EBB2B]">→ timeline + report.json done</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <svg class="block w-full h-2" aria-hidden="true" shape-rendering="crispEdges"><defs><pattern id="pxA" width="16" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#5EBB2B"/><rect x="8" width="4" height="8" fill="#8B5A2B"/><rect x="12" width="4" height="8" fill="#C6C6C6"/></pattern></defs><rect width="100%" height="100%" fill="url(#pxA)"/></svg>
+
+<!-- PROBLEM VS SOLUTION -->
+<section id="problem" class="border-b border-neutral-800">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-12 md:py-16">
+    <p class="font-mono text-xs text-neutral-500 mb-3">/problem</p>
+    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-neutral-50 max-w-2xl">Stop hand-placing pixels. Compile scenes from data.</h2>
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="border border-neutral-800 bg-neutral-950 p-6">
+        <p class="font-mono text-[11px] uppercase tracking-wider text-red-400/90">before — manual keyframes in NLE</p>
+        <h3 class="mt-2 text-xl font-semibold text-neutral-200">Hours of manual nudging. Single-use timelines.</h3>
+        <ul class="mt-4 space-y-3 text-sm text-neutral-400 leading-relaxed">
+          <li class="flex gap-2"><span class="font-mono text-neutral-600">[x]</span> Crafting, furnace, trading, and inventory GUIs rebuilt by hand.</li>
+          <li class="flex gap-2"><span class="font-mono text-neutral-600">[x]</span> Non-integer scaling blurs hard voxel pixel-art edges.</li>
+          <li class="flex gap-2"><span class="font-mono text-neutral-600">[x]</span> Codec drift shifts pixel geometry across exports.</li>
+          <li class="flex gap-2"><span class="font-mono text-neutral-600">[x]</span> Editing a layout or action requires rebuilding the sequence.</li>
+        </ul>
+      </div>
+      <div class="border border-[#5EBB2B]/30 bg-neutral-950 p-6">
+        <p class="font-mono text-[11px] uppercase tracking-wider text-[#5EBB2B]">after — scene.json in → layers + manifest out</p>
+        <h3 class="mt-2 text-xl font-semibold text-neutral-50">Declarative scene definition. Pure-function render.</h3>
+        <ul class="mt-4 space-y-3 text-sm text-neutral-300 leading-relaxed">
+          <li class="flex gap-2"><span class="font-mono text-[#5EBB2B]">[✓]</span> Python + Pillow engine renders tight PNG layers with alpha and NEAREST-only integer scaling.</li>
+          <li class="flex gap-2"><span class="font-mono text-[#5EBB2B]">[✓]</span> Colors match 1:1 from game version 26.3. Lossless-only MOV (qtrle/PNG) prevents drift.</li>
+          <li class="flex gap-2"><span class="font-mono text-[#5EBB2B]">[✓]</span> Generates manifest.json (canvas, fps, tracks, clips, positions, scales, keyframes, hashes) plus README_premiere.txt.</li>
+          <li class="flex gap-2"><span class="font-mono text-[#5EBB2B]">[✓]</span> Tested across 163 golden tests for byte-identical output.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROOF -->
+<section id="proof" class="border-b border-neutral-800 bg-neutral-900/20">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-12 md:py-16">
+    <p class="font-mono text-xs text-neutral-500 mb-3">/proof</p>
+    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-neutral-50">The Premiere timeline matches the engine render.</h2>
+    <p class="mt-4 text-neutral-400 max-w-2xl leading-relaxed">Every rendered asset carries file and pixel hashes in manifest.json. During timeline assembly, the CEP/ExtendScript plugin verifies hashes and writes a per-clip report.json.</p>
+    <figure class="mt-8 border border-neutral-800 bg-neutral-950">
+      <div class="flex items-center justify-between px-3 py-2 border-b border-neutral-800 font-mono text-[11px] text-neutral-500">
+        <span>verification pipeline — engine vs premiere</span>
+        <span class="text-neutral-600">lossless path</span>
+      </div>
+      <img src="assets/compare_sheet.png" alt="Comparison sheet showing engine render versus Premiere export" class="w-full block bg-black">
+      <figcaption class="px-3 py-2 border-t border-neutral-800 font-mono text-[11px] text-neutral-500">Lossless-only MOV (qtrle/PNG) pipeline. ProRes was excluded after measuring 47px drift against a max 2 threshold.</figcaption>
+    </figure>
+    <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-neutral-800 border border-neutral-800 font-mono text-sm">
+      <div class="bg-neutral-950 p-4"><p class="text-neutral-500 text-[11px] uppercase">tests</p><p class="text-neutral-100 mt-1">163 golden</p></div>
+      <div class="bg-neutral-950 p-4"><p class="text-neutral-500 text-[11px] uppercase">canvas</p><p class="text-neutral-100 mt-1">1920×1080 @60fps</p></div>
+      <div class="bg-neutral-950 p-4"><p class="text-neutral-500 text-[11px] uppercase">codec</p><p class="text-neutral-100 mt-1">qtrle / PNG</p></div>
+      <div class="bg-neutral-950 p-4"><p class="text-neutral-500 text-[11px] uppercase">plugin</p><p class="text-neutral-100 mt-1">CEP / ExtendScript</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" class="border-b border-neutral-800">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-12 md:py-16">
+    <p class="font-mono text-xs text-neutral-500 mb-3">/how</p>
+    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-neutral-50">Declarative scene in. Editable timeline out.</h2>
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="border border-neutral-800 bg-neutral-950 p-6 flex flex-col">
+        <p class="font-mono text-4xl text-neutral-700">1</p>
+        <h3 class="mt-2 font-mono text-sm font-semibold text-neutral-100">scene.json</h3>
+        <p class="mt-2 text-sm text-neutral-400 leading-relaxed">Define screen layout and a timeline of deterministic actions: show, hide, pop, slide_in, set_text, hover, cursor_move, end.</p>
+        <pre class="mt-4 text-[12px] leading-relaxed bg-black border border-neutral-800 p-3 font-mono text-neutral-300 overflow-x-auto"><code>{
+  "screen": "calculator",
+  "timeline": [
+    { "do": "show" },
+    { "do": "slide_in" },
+    { "do": "cursor_move" },
+    { "do": "hover" },
+    { "do": "set_text" },
+    { "do": "end" }
+  ]
+}</code></pre>
+        <p class="mt-3 font-mono text-[11px] text-neutral-600">Declarative action sequence for the calculator scene.</p>
+      </div>
+      <div class="border border-neutral-800 bg-neutral-950 p-6 flex flex-col">
+        <p class="font-mono text-4xl text-neutral-700">2</p>
+        <h3 class="mt-2 font-mono text-sm font-semibold text-neutral-100">PNG layers + manifest.json</h3>
+        <p class="mt-2 text-sm text-neutral-400 leading-relaxed">Python + Pillow renders tight PNG layers with alpha, writes manifest.json, and generates a README_premiere.txt manual assembly recipe.</p>
+        <pre class="mt-4 text-[12px] leading-relaxed bg-black border border-neutral-800 p-3 font-mono text-neutral-300 overflow-x-auto"><code>layers/
+  *.png (tight alpha layers)
+manifest.json
+  canvas, fps, tracks, clips
+  positions, scales, keyframes
+  file_hash, pixel_hash
+README_premiere.txt</code></pre>
+        <p class="mt-3 font-mono text-[11px] text-neutral-600">1920×1080 @60fps · NEAREST-only · colors 1:1 game 26.3</p>
+      </div>
+      <div class="border border-neutral-800 bg-neutral-950 p-6 flex flex-col">
+        <p class="font-mono text-4xl text-neutral-700">3</p>
+        <h3 class="mt-2 font-mono text-sm font-semibold text-neutral-100">CEP/ExtendScript plugin</h3>
+        <p class="mt-2 text-sm text-neutral-400 leading-relaxed">Reads manifest.json, inserts clips on tracks, writes Position and Scale keyframes, verifies hashes, and writes report.json per clip.</p>
+        <pre class="mt-4 text-[12px] leading-relaxed bg-black border border-neutral-800 p-3 font-mono text-neutral-300 overflow-x-auto"><code>{
+  "ok": true,
+  "manifest_hash": "verified",
+  "applied": "all clips",
+  "errors": []
+}</code></pre>
+        <p class="mt-3 font-mono text-[11px] text-neutral-600">Assembles in one click and matches the engine render.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AGENTIC LAYER -->
+<section id="agents" class="border-b border-neutral-800 bg-neutral-900/20">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-12 md:py-16 grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div>
+      <p class="font-mono text-xs text-neutral-500 mb-3">/agents</p>
+      <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-neutral-50">Any LLM can author scenes. Nondeterminism stops at scene.json.</h2>
+      <p class="mt-4 text-neutral-400 leading-relaxed">An authoring agent uses our skill guide, generated JSON Schema, and self-correcting validator. Once scene.json is saved, everything below is a pure function.</p>
+      <ul class="mt-6 space-y-3 text-sm text-neutral-300">
+        <li class="border border-neutral-800 bg-neutral-950 p-4"><span class="font-mono text-[#5EBB2B]">skill guide</span><span class="text-neutral-500 font-mono"> — </span>documents layout structure and closed action primitives (show, hide, pop, slide_in, set_text, hover, cursor_move, end).</li>
+        <li class="border border-neutral-800 bg-neutral-950 p-4"><span class="font-mono text-[#5EBB2B]">JSON Schema</span><span class="text-neutral-500 font-mono"> — </span>generated directly from the engine so schema definitions and rendering logic stay aligned.</li>
+        <li class="border border-neutral-800 bg-neutral-950 p-4"><span class="font-mono text-[#5EBB2B]">self-correcting validator</span><span class="text-neutral-500 font-mono"> — </span>every error carries an exact location and usually a fix; conscious soft-rule breaks use allow + reason and land in manifest.json.</li>
+      </ul>
+    </div>
+    <div class="flex flex-col gap-4">
+      <pre class="text-[12px] leading-relaxed bg-black border border-neutral-800 p-4 font-mono text-neutral-300 overflow-x-auto"><code><span class="text-neutral-600">// validator returns location + fix</span>
+{
+  "level": "error",
+  "path": "/timeline/action",
+  "msg": "glyph not in atlas",
+  "fix": {
+    "op": "replace",
+    "path": "/timeline/action",
+    "value": "hello"
+  }
+}</code></pre>
+      <pre class="text-[12px] leading-relaxed bg-black border border-neutral-800 p-4 font-mono text-neutral-300 overflow-x-auto"><code><span class="text-neutral-600">// conscious soft-rule break lands in manifest</span>
+{
+  "level": "allowed",
+  "path": "/root/button",
+  "reason": "explicit soft-rule override"
+}</code></pre>
+      <p class="font-mono text-[11px] text-neutral-500 leading-relaxed">Every tested widget and action becomes a deterministic primitive reusable across future scenes.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WHY US -->
+<section id="why" class="border-b border-neutral-800">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-12 md:py-16">
+    <p class="font-mono text-xs text-neutral-500 mb-3">/why</p>
+    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-neutral-50 max-w-2xl">Presets give you flat clips. AgentMotion gives you an editable timeline.</h2>
+    <p class="mt-4 text-neutral-400 max-w-2xl leading-relaxed">Different architectures determine what lands in your NLE and whether you can keep editing after import.</p>
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="border border-neutral-800 bg-neutral-950 p-6 flex flex-col">
+        <p class="font-mono text-[11px] uppercase tracking-wider text-neutral-500">preset libraries</p>
+        <h3 class="mt-2 text-lg font-semibold text-neutral-200">Fixed catalog of finished flat clips.</h3>
+        <p class="mt-2 text-sm text-neutral-400 leading-relaxed">Preset libraries sell a fixed catalog of pre-rendered clips. Once imported into your editor, the output is a flat video file with no per-layer keyframes or custom scene layouts.</p>
+      </div>
+      <div class="border border-neutral-800 bg-neutral-950 p-6 flex flex-col">
+        <p class="font-mono text-[11px] uppercase tracking-wider text-neutral-500">generalist agent animation</p>
+        <h3 class="mt-2 text-lg font-semibold text-neutral-200">Vendor-hosted generation, flat shared export.</h3>
+        <p class="mt-2 text-sm text-neutral-400 leading-relaxed">Generalist agent animation lives on the vendor platform and ends as a flat shared file. You cannot adjust individual GUI tracks or re-time native keyframes inside Premiere Pro.</p>
+      </div>
+      <div class="border border-[#5EBB2B]/30 bg-neutral-950 p-6 flex flex-col">
+        <p class="font-mono text-[11px] uppercase tracking-wider text-[#5EBB2B]">agentmotion</p>
+        <h3 class="mt-2 text-lg font-semibold text-neutral-50">Editable Premiere-native timeline for any JSON scene.</h3>
+        <p class="mt-2 text-sm text-neutral-300 leading-relaxed">Author any Minecraft-style GUI scene as declarative JSON. The engine renders voxel pixel-art layers with NEAREST-only integer scaling, and the CEP plugin builds native tracks, clips, and Position/Scale keyframes directly in Premiere Pro.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPEC -->
+<section class="border-b border-neutral-800">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-12 md:py-16">
+    <p class="font-mono text-xs text-neutral-500 mb-3">/spec</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-px bg-neutral-800 border border-neutral-800 font-mono text-sm">
+      <div class="bg-neutral-950 p-5"><p class="text-neutral-500 text-[11px] uppercase tracking-wider">engine</p><p class="mt-1 text-neutral-200">Python + Pillow. Renders scene.json to tight PNG layers with alpha, manifest.json, and README_premiere.txt.</p></div>
+      <div class="bg-neutral-950 p-5"><p class="text-neutral-500 text-[11px] uppercase tracking-wider">canvas</p><p class="mt-1 text-neutral-200">1920×1080 @60fps with alpha layers. NEAREST-only integer scaling.</p></div>
+      <div class="bg-neutral-950 p-5"><p class="text-neutral-500 text-[11px] uppercase tracking-wider">fidelity</p><p class="mt-1 text-neutral-200">163 golden tests with byte-identical output. Colors 1:1 from game version 26.3.</p></div>
+      <div class="bg-neutral-950 p-5"><p class="text-neutral-500 text-[11px] uppercase tracking-wider">premiere</p><p class="mt-1 text-neutral-200">CEP/ExtendScript plugin (UXP spike rejected after a silent hang with no error). Lossless-only MOV (qtrle/PNG; ProRes excluded after measuring 47px drift, max 2).</p></div>
+    </div>
+  </div>
+</section>
+
+  <svg class="block w-full h-2" aria-hidden="true" shape-rendering="crispEdges"><defs><pattern id="pxB" width="16" height="8" patternUnits="userSpaceOnUse"><rect width="4" height="8" fill="#C6C6C6"/><rect x="4" width="4" height="8" fill="#8B5A2B"/><rect x="8" width="8" height="8" fill="#5EBB2B"/></pattern></defs><rect width="100%" height="100%" fill="url(#pxB)"/></svg>
+
+<footer class="bg-neutral-950">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <p class="font-mono text-xs text-neutral-500">© AgentMotion, solo-founder</p>
+    <nav class="flex gap-5 font-mono text-xs text-neutral-500">
+      <a href="#problem" class="hover:text-neutral-200">problem</a>
+      <a href="#proof" class="hover:text-neutral-200">proof</a>
+      <a href="#how" class="hover:text-neutral-200">how</a>
+      <a href="#agents" class="hover:text-neutral-200">agents</a>
+      <a href="#why" class="hover:text-neutral-200">why</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var btn = document.getElementById('menuBtn');
+  var menu = document.getElementById('mobileMenu');
+  if(btn && menu){ btn.addEventListener('click', function(){ menu.classList.toggle('hidden'); }); }
+})();
+</script>
+</body>
+</html>

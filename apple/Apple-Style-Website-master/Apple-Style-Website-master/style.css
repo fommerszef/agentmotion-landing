@@ -1,0 +1,146 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body .menu-bar {
+  background-color: FBFBFD;
+  font-family: sans-serif;
+  position: relative;
+  padding: 10px 100px 0px 100px;
+}
+body .menu-bar ul {
+  width: 100%;
+  margin: 0;
+  display: flex;
+  justify-content: space-around;
+}
+body .menu-bar ul li {
+  list-style: none;
+}
+body .menu-bar ul li a {
+  display: block;
+  height: 300%;
+  width: 150%;
+  text-decoration: none;
+  color: black;
+  font-size: 13px;
+}
+body .menu-bar ul li:hover .store-container {
+  opacity: 1;
+  transform: translateY(0);
+}
+body .menu-bar ul li .fa-brands.fa-apple {
+  font-size: 20px;
+}
+body .menu-bar ul li .store-container {
+  position: absolute;
+  top: calc(100% + 2rem);
+  left: 10%;
+  display: grid;
+  grid-template-columns: 15% 10% 10%;
+  gap: 10px 50px;
+  width: 90%;
+  background-color: #FBFBFD;
+  transform: translateY(-10px);
+  transition: opacity 200ms ease-in-out, transform 200ms ease-in-out;
+  opacity: 0;
+}
+body .menu-bar ul li .store-container .store-container-item1 {
+  font-size: 12px;
+  color: #7F7F83;
+}
+body .menu-bar ul li .store-container .store-container-item2 {
+  font-size: 20px;
+  font-weight: bold;
+}
+body .menu-bar ul li .store-container .store-container-item3, body .menu-bar ul li .store-container .store-container-item4 {
+  font-size: 13px;
+}
+body .mac-air-15 {
+  background-image: url(../images/first.jpg);
+  background-size: cover;
+  background-position: center center;
+  text-align: center;
+  padding-top: 5%;
+  cursor: pointer;
+  position: relative;
+  height: 100vh;
+}
+body .mac-air-15 h2 {
+  font-size: 50px;
+  font-weight: bold;
+}
+body .mac-air-15 p {
+  font-size: 30px;
+  margin-bottom: 1%;
+}
+body .mac-air-15 a {
+  text-decoration: none;
+  color: rgb(93, 166, 234);
+  font-size: 20px;
+}
+body .mac-air-15 a:hover {
+  text-decoration: underline;
+}
+body .slider {
+  width: 100%;
+  height: 500px;
+  display: flex;
+  flex-flow: wrap column;
+  column-gap: 10px;
+  overflow: hidden;
+}
+body .slider .slide img {
+  width: 100%;
+  height: 500px;
+}
+body .next {
+  position: relative;
+  top: -275px;
+  right: -96%;
+  text-decoration: none;
+  color: #fafafa;
+  font-size: 50px;
+  font-weight: bolder;
+}
+body .previous {
+  position: relative;
+  top: -275px;
+  left: 0;
+  text-decoration: none;
+  color: #fafafa;
+  font-size: 50px;
+  font-weight: bolder;
+}
+body .dot-container {
+  width: 100%;
+  background-color: aquamarine;
+  margin: -50px auto;
+}
+body .dot-container .dot {
+  width: 10px;
+  height: 10px;
+  background-color: #d0cdcd;
+  border-radius: 50px;
+  display: inline-block;
+  cursor: pointer;
+}
+body .dot-container .dot:first-child {
+  margin-left: 50%;
+}
+body .dot-container .dot:hover {
+  background-color: #212122;
+}
+body .dot-container .playandpause {
+  display: inline-block;
+  background-color: lightcoral;
+  margin-left: 40%;
+}
+body .dot-container .playandpause i {
+  font-size: 20px;
+  color: black;
+}
+
+/*# sourceMappingURL=style.css.map */
